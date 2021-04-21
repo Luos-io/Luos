@@ -55,6 +55,7 @@ volatile uint16_t last_node = 0;
  ******************************************************************************/
 void Robus_Init(memory_stats_t *memory_stats)
 {
+#ifndef SNIFFER_H
     // Init the number of created  virtual container.
     ctx.ll_container_number = 0;
     // Set default container id. This id is a void id used if no container is created.
@@ -63,6 +64,18 @@ void Robus_Init(memory_stats_t *memory_stats)
     ctx.node.certified = false;
     // no transmission lock
     ctx.tx.lock = false;
+
+#else   //in case we have a sniffer initialize the sniffer node
+    //The node/container sniffer is created from the beginning
+    ctx.ll_container_number = 1;
+    // Set unique fixed ID of sniffer node
+    ctx.node.node_id = 0xFFF;
+    // Sniffer node is certified
+    ctx.node.certified = true;
+    // sniffer no tx
+    ctx.tx.lock = true;
+#endif /* SNIFFER_H */
+    
     // Init collision state
     ctx.tx.collision = false;
     // Init Tx status
@@ -118,6 +131,11 @@ ll_container_t *Robus_ContainerCreate(uint16_t type)
     ctx.ll_container_table[ctx.ll_container_number].type = type;
     // Initialise the container id, TODO the ID could be stored in EEprom, the default ID could be set in factory...
     ctx.ll_container_table[ctx.ll_container_number].id = DEFAULTID;
+
+#ifdef SNIFFER_H    //initialization of sniffer's container fixed ID
+    ctx.ll_container_table[ctx.ll_container_number].id = 0xFFFF;
+#endif /* SNIFFER_H */
+
     // Initialize dead container detection
     ctx.ll_container_table[ctx.ll_container_number].dead_container_spotted = 0;
     // Clear stats
@@ -336,6 +354,11 @@ static error_return_t Robus_MsgHandler(msg_t *input)
     uint32_t baudrate;
     msg_t output_msg;
     node_bootstrap_t node_bootstrap;
+
+#ifdef SNIFFER_H    //the messages should always be treated by the sniffer and not by robus
+    return FAILED;
+#endif /* SNIFFER_H */
+
     ll_container_t *ll_container = Recep_GetConcernedLLContainer(&input->header);
     switch (input->header.cmd)
     {
