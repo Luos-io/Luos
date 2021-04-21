@@ -38,7 +38,12 @@ void PortMng_Init(void)
     // Reinit ll_container id
     for (uint8_t i = 0; i < ctx.ll_container_number; i++)
     {
+#ifdef SNIFFER_H //do not change the sniffer's id
+        if (ctx.ll_container_table[i].id != 0xFFFF)
+            ctx.ll_container_table[i].id = DEFAULTID;
+#else
         ctx.ll_container_table[i].id = DEFAULTID;
+#endif /* SNIFFER_H */
     }
     // Reinit port table
     for (uint8_t port = 0; port < NBR_PORT; port++)
@@ -67,12 +72,14 @@ void PortMng_PtpHandler(uint8_t PortNbr)
         }
         PortMng_Reset();
     }
+#ifndef SNIFFER_H   //in case of a sniffer we do not notify our presence
     else if (Port_ExpectedState == POKE)
     {
         // we receive a poke, pull the line to notify your presence
         LuosHAL_PushPTP(PortNbr);
         ctx.port.activ = PortNbr;
     }
+#endif  /* SNIFFER_H */
 }
 /******************************************************************************
  * @brief Poke
