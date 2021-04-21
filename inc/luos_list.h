@@ -29,7 +29,8 @@ typedef enum
     CONTROLLER_MOTOR_MOD,
     VOID_MOD,
     LOAD_MOD,
-    LUOS_LAST_TYPE
+    LUOS_LAST_TYPE,
+    SNIFFER_MOD
 } luos_type_t;
 
 typedef enum
