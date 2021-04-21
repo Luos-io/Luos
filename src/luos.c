@@ -133,7 +133,10 @@ void Luos_Loop(void)
  * @return SUCCEED if the command if for Luos else Fail
  ******************************************************************************/
 static error_return_t Luos_IsALuosCmd(container_t *container, uint8_t cmd, uint16_t size)
-{
+{ 
+#ifdef SNIFFER_H  //the messages should always be treated by the sniffer and not by luos
+    return FAILED;
+#endif /* SNIFFER_H */
     switch (cmd)
     {
         case WRITE_NODE_ID:
