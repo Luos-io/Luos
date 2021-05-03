@@ -55,9 +55,10 @@ volatile uint16_t last_node = 0;
  ******************************************************************************/
 void Robus_Init(memory_stats_t *memory_stats)
 {
-#ifndef SNIFFER_H
     // Init the number of created  virtual container.
     ctx.ll_container_number = 0;
+    
+#ifndef SNIFFER_H
     // Set default container id. This id is a void id used if no container is created.
     ctx.node.node_id = DEFAULTID;
     // By default node are not certified.
@@ -66,8 +67,6 @@ void Robus_Init(memory_stats_t *memory_stats)
     ctx.tx.lock = false;
 
 #else   //in case we have a sniffer initialize the sniffer node
-    //The node/container sniffer is created from the beginning
-    ctx.ll_container_number = 1;
     // Set unique fixed ID of sniffer node
     ctx.node.node_id = 0xFFF;
     // Sniffer node is certified

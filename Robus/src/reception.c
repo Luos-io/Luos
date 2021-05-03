@@ -254,6 +254,7 @@ void Recep_Timeout(void)
     MsgAlloc_InvalidMsg();
     Recep_Reset();
     Transmit_End(); // This is possibly the end of a transmission, check it.
+
 }
 /******************************************************************************
  * @brief reset the reception state machine
@@ -406,14 +407,9 @@ void Recep_InterpretMsgProtocol(msg_t *msg)
     // Find if we are concerned by this message.
 
 #ifdef SNIFFER_H    //always allocate msg for the sniffer_container
-        for (i = 0; i < ctx.ll_container_number; i++)
-        {
-            if (ctx.ll_container_table[i].id == 0xFFFF)
-            {
-                MsgAlloc_LuosTaskAlloc((ll_container_t *)&ctx.ll_container_table[i], msg);
-                return;
-            }
-        }
+                
+    MsgAlloc_LuosTaskAlloc((ll_container_t *)&ctx.ll_container_table[0], msg);
+    return;
 #endif /*  SNIFFER_H */
     switch (msg->header.target_mode)
     {
