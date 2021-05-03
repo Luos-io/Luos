@@ -102,6 +102,7 @@ volatile uint16_t luos_tasks_stack_id;       /*!< last writen luos_tasks id. */
 volatile tx_task_t tx_tasks[MAX_MSG_NB]; /*!< Message to transmit allocation table. */
 volatile uint16_t tx_tasks_stack_id;     /*!< last writen tx_tasks id. */
 
+
 /*******************************************************************************
  * Functions
  ******************************************************************************/
@@ -310,9 +311,11 @@ static inline void MsgAlloc_FindNewOldestMsg(void)
     // check it on msg_tasks
     MsgAlloc_OldestMsgCandidate((msg_t *)msg_tasks[0]);
     // check it on luos_tasks
+#ifndef SNIFFER_H //dont check luos_tasks and tx_tasks as they are not initialized
     MsgAlloc_OldestMsgCandidate(luos_tasks[0].msg_pt);
     // check it on tx_tasks
     MsgAlloc_OldestMsgCandidate((msg_t *)tx_tasks[0].data_pt);
+#endif /* SNIFFER_H */
 }
 
 /*******************************************************************************
