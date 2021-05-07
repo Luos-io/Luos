@@ -137,6 +137,7 @@ void Recep_GetData(volatile uint8_t *data)
         uint16_t crc = ((uint16_t)current_msg->data[data_size]) | ((uint16_t)current_msg->data[data_size + 1] << 8);
         if (crc == crc_val)
         {
+#ifndef SNIFFER_H
             if (((current_msg->header.target_mode == IDACK) || (current_msg->header.target_mode == NODEIDACK)))
             {
                 Transmit_SendAck();
@@ -154,14 +155,19 @@ void Recep_GetData(volatile uint8_t *data)
             {
                 MsgAlloc_EndMsg();
             }
+#else   //in case of a sniffer we dont send an ACK
+            MsgAlloc_EndMsg();
+#endif
         }
         else
         {
             ctx.rx.status.rx_error = true;
+#ifndef SNIFFER_H   //in case of a sniffer we dont send an ACK
             if ((current_msg->header.target_mode == IDACK) || (current_msg->header.target_mode == NODEIDACK))
             {
                 Transmit_SendAck();
             }
+#endif
             MsgAlloc_InvalidMsg();
         }
         ctx.rx.callback = Recep_Drop;
@@ -333,6 +339,9 @@ uint8_t Recep_NodeConcerned(header_t *header)
 {
     uint16_t i = 0;
     // Find if we are concerned by this message.
+#ifdef SNIFFER_H    //In case of the sniffer app we are always concerned by each message
+    return true;
+#endif /* SNIFFER_H */
     switch (header->target_mode)
     {
         case IDACK:
@@ -394,6 +403,17 @@ void Recep_InterpretMsgProtocol(msg_t *msg)
 {
     uint16_t i = 0;
     // Find if we are concerned by this message.
+
+#ifdef SNIFFER_H    //always allocate msg for the sniffer_container
+        for (i = 0; i < ctx.ll_container_number; i++)
+        {
+            if (ctx.ll_container_table[i].id == 0xFFFF)
+            {
+                MsgAlloc_LuosTaskAlloc((ll_container_t *)&ctx.ll_container_table[i], msg);
+                return;
+            }
+        }
+#endif /*  SNIFFER_H */
     switch (msg->header.target_mode)
     {
         case IDACK:
