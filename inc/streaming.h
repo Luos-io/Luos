@@ -40,5 +40,6 @@ void Stream_ResetStreamingChannel(streaming_channel_t *stream);
 uint8_t Stream_PutSample(streaming_channel_t *stream, const void *data, uint16_t size);
 uint8_t Stream_GetSample(streaming_channel_t *stream, void *data, uint16_t size);
 uint8_t Stream_GetAvailableSampleNB(streaming_channel_t *stream);
+uint8_t Stream_SetAvailableSampleNB(streaming_channel_t *stream, uint16_t size);
 
 #endif /* LUOS_H */

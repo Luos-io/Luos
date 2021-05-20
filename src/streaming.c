@@ -137,3 +137,23 @@ uint8_t Stream_GetAvailableSampleNB(streaming_channel_t *stream)
     }
     return nb_available_sample;
 }
+/******************************************************************************
+ * @brief set a number of sample available in buffer
+ * @param stream streaming channel pointer
+ * @param size The number of data to copy
+ * @return number of available samples
+ ******************************************************************************/
+uint8_t Stream_SetAvailableSampleNB(streaming_channel_t *stream, uint16_t size)
+{
+    if (((size * stream->data_size) + stream->data_ptr) > stream->end_ring_buffer)
+    {
+        uint16_t chunk1 = stream->end_ring_buffer - stream->data_ptr;
+        uint16_t chunk2 = (size * stream->data_size) - chunk1;
+        stream->data_ptr = stream->ring_buffer + chunk2;
+    }
+    else
+    {
+    	stream->data_ptr = stream->data_ptr + (size * stream->data_size);
+    }
+	return Stream_GetAvailableSampleNB(stream);
+}
