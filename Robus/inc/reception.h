@@ -33,6 +33,7 @@ typedef struct
     DATA_CB callback;
     status_t status;
 } RxCom_t;
+
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -54,7 +55,7 @@ void Recep_EndMsg(void);
 void Recep_Reset(void);
 void Recep_Timeout(void);
 void Recep_InterpretMsgProtocol(msg_t *msg);
-uint8_t Recep_NodeConcerned(header_t *header);
+luos_localhost_t Recep_NodeConcerned(header_t *header);
 ll_container_t *Recep_GetConcernedLLContainer(header_t *header);
 
 #endif /* _RECEPTION_H_ */

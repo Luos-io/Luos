@@ -836,7 +836,7 @@ void MsgAlloc_ClearMsgFromLuosTasks(msg_t *msg)
  * @param data to transmit
  * @param size of the data to transmit
  ******************************************************************************/
-error_return_t MsgAlloc_SetTxTask(ll_container_t *ll_container_pt, uint8_t *data, uint16_t crc, uint16_t size, uint8_t locahost, uint8_t ack)
+error_return_t MsgAlloc_SetTxTask(ll_container_t *ll_container_pt, uint8_t *data, uint16_t crc, uint16_t size, luos_localhost_t localhost, uint8_t ack)
 {
     LUOS_ASSERT((tx_tasks_stack_id >= 0) && (tx_tasks_stack_id < MAX_MSG_NB) && ((uint32_t)data > 0) && ((uint32_t)current_msg < (uint32_t)&msg_buffer[MSG_BUFFER_SIZE]) && ((uint32_t)current_msg >= (uint32_t)&msg_buffer[0]));
     void *rx_msg_bkp          = 0;
@@ -936,21 +936,28 @@ error_return_t MsgAlloc_SetTxTask(ll_container_t *ll_container_pt, uint8_t *data
     // Copy 3 bytes from the message to transmit just to be sure to be ready to start transmitting
     // During those 3 bytes we have the time necessary to copy the other bytes
     memcpy((void *)tx_msg, (void *)data, 3);
-    // Now we are ready to transmit, we can create the tx task
-
-    LuosHAL_SetIrqState(false);
-    tx_tasks[tx_tasks_stack_id].size            = size;
-    tx_tasks[tx_tasks_stack_id].data_pt         = (uint8_t *)tx_msg;
-    tx_tasks[tx_tasks_stack_id].ll_container_pt = ll_container_pt;
-    tx_tasks[tx_tasks_stack_id].localhost       = locahost;
-    // Check if last tx task is the oldest msg of the buffer
-    if (tx_tasks_stack_id == 0)
+// Check if we need to transmit
+#ifndef VERBOSE_LOCALHOST
+    if (localhost != LOCALHOST)
     {
-        MsgAlloc_OldestMsgCandidate((msg_t *)tx_tasks[0].data_pt);
+#endif
+        // Now we are ready to transmit, we can create the tx task
+        LuosHAL_SetIrqState(false);
+        tx_tasks[tx_tasks_stack_id].size            = size;
+        tx_tasks[tx_tasks_stack_id].data_pt         = (uint8_t *)tx_msg;
+        tx_tasks[tx_tasks_stack_id].ll_container_pt = ll_container_pt;
+        tx_tasks[tx_tasks_stack_id].localhost       = (localhost != EXTERNALHOST);
+        // Check if last tx task is the oldest msg of the buffer
+        if (tx_tasks_stack_id == 0)
+        {
+            MsgAlloc_OldestMsgCandidate((msg_t *)tx_tasks[0].data_pt);
+        }
+        tx_tasks_stack_id++;
+        LUOS_ASSERT(tx_tasks_stack_id < MAX_MSG_NB);
+        LuosHAL_SetIrqState(true);
+#ifndef VERBOSE_LOCALHOST
     }
-    tx_tasks_stack_id++;
-    LUOS_ASSERT(tx_tasks_stack_id < MAX_MSG_NB);
-    LuosHAL_SetIrqState(true);
+#endif
 
     //finish the copy
     if (ack != 0)
@@ -969,7 +976,7 @@ error_return_t MsgAlloc_SetTxTask(ll_container_t *ll_container_pt, uint8_t *data
         ((char *)tx_msg)[size - 1] = (uint8_t)(crc >> 8);
     }
     //manage localhost
-    if (locahost)
+    if (localhost != EXTERNALHOST)
     {
         // This is a localhost message copy it as a message task
         LUOS_ASSERT(msg_tasks[msg_tasks_stack_id] == 0);
@@ -1052,7 +1059,7 @@ void MsgAlloc_PullContainerFromTxTask(uint16_t container_id)
  * @param localhost is this message a localhost one
  * @return error_return_t : Fail is there is no more message available.
  ******************************************************************************/
-error_return_t MsgAlloc_GetTxTask(ll_container_t **ll_container_pt, uint8_t **data, uint16_t *size, uint8_t *locahost)
+error_return_t MsgAlloc_GetTxTask(ll_container_t **ll_container_pt, uint8_t **data, uint16_t *size, uint8_t *localhost)
 {
     LUOS_ASSERT(tx_tasks_stack_id < MAX_MSG_NB);
     MsgAlloc_ValidDataIntegrity();
@@ -1061,7 +1068,7 @@ error_return_t MsgAlloc_GetTxTask(ll_container_t **ll_container_pt, uint8_t **da
         *data            = tx_tasks[0].data_pt;
         *size            = tx_tasks[0].size;
         *ll_container_pt = tx_tasks[0].ll_container_pt;
-        *locahost        = tx_tasks[0].localhost;
+        *localhost       = tx_tasks[0].localhost;
         return SUCCEED;
     }
     return FAILED;

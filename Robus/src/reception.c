@@ -329,7 +329,7 @@ ll_container_t *Recep_GetConcernedLLContainer(header_t *header)
  * @param header of message
  * @return None
  ******************************************************************************/
-uint8_t Recep_NodeConcerned(header_t *header)
+luos_localhost_t Recep_NodeConcerned(header_t *header)
 {
     uint16_t i = 0;
     // Find if we are concerned by this message.
@@ -343,7 +343,7 @@ uint8_t Recep_NodeConcerned(header_t *header)
             {
                 if ((header->target == ctx.ll_container_table[i].id))
                 {
-                    return true;
+                    return LOCALHOST;
                 }
             }
             break;
@@ -353,14 +353,14 @@ uint8_t Recep_NodeConcerned(header_t *header)
             {
                 if (header->target == ctx.ll_container_table[i].type)
                 {
-                    return true;
+                    return MULTIHOST;
                 }
             }
             break;
         case BROADCAST:
             if (header->target == BROADCAST_VAL)
             {
-                return true;
+                return MULTIHOST;
             }
             break;
         case NODEIDACK:
@@ -368,22 +368,22 @@ uint8_t Recep_NodeConcerned(header_t *header)
         case NODEID:
             if ((header->target == 0) && (ctx.port.activ != NBR_PORT) && (ctx.port.keepLine == false))
             {
-                return true; // discard message if ID = 0 and no Port activ
+                return LOCALHOST; // discard message if ID = 0 and no Port activ
             }
             else
             {
                 if ((header->target == ctx.node.node_id) && (header->target != 0))
                 {
-                    return true;
+                    return LOCALHOST;
                 }
             }
             break;
         case MULTICAST: // For now Multicast is disabled
         default:
-            return false;
+            return EXTERNALHOST;
             break;
     }
-    return false;
+    return EXTERNALHOST;
 }
 /******************************************************************************
  * @brief Parse msg to find all modules concerned and create

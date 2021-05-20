@@ -15,6 +15,17 @@
  ******************************************************************************/
 
 /******************************************************************************
+ * @struct luos_localhost_t
+ * @brief Transmit message direction
+ ******************************************************************************/
+typedef enum
+{
+    EXTERNALHOST, // This message is for an external service
+    LOCALHOST,    // This message is for an internal service only
+    MULTIHOST     // This message is for an internal and an external service
+} luos_localhost_t;
+
+/******************************************************************************
  * @struct memory_stats_t
  * @brief store informations about RAM occupation
  ******************************************************************************/

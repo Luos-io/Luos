@@ -187,7 +187,7 @@ error_return_t Robus_SendMsg(ll_container_t *ll_container, msg_t *msg)
     }
 
     // Check the localhost situation
-    uint8_t localhost = Recep_NodeConcerned(&msg->header);
+    luos_localhost_t localhost = Recep_NodeConcerned(&msg->header);
     // Check if ACK needed
     if (((msg->header.target_mode == IDACK) || (msg->header.target_mode == NODEIDACK)) && (localhost && (msg->header.target != DEFAULTID)))
     {
@@ -201,8 +201,15 @@ error_return_t Robus_SendMsg(ll_container_t *ll_container, msg_t *msg)
     {
         return FAILED;
     }
-    // **********Try to send the message********************
-    Transmit_Process();
+// **********Try to send the message********************
+#ifndef VERBOSE_LOCALHOST
+    if (localhost != LOCALHOST)
+    {
+#endif
+        Transmit_Process();
+#ifndef VERBOSE_LOCALHOST
+    }
+#endif
 
     return SUCCEED;
 }
