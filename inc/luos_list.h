@@ -29,6 +29,7 @@ typedef enum
     CONTROLLER_MOTOR_MOD,
     VOID_MOD,
     LOAD_MOD,
+    PIPE_MOD,
     LUOS_LAST_TYPE
 } luos_type_t;
 
@@ -48,7 +49,9 @@ typedef enum
     // ************* End of Luos managed commands ****************
 
     // Common register for all containers
-    ASK_PUB_CMD, // asks a container to publish its data
+    GET_CMD,               // asks a container to publish its data
+    ASK_PUB_CMD = GET_CMD, // retrocompatibility line
+    SET_CMD,               // set some undefined data
 
     // Generic data
     COLOR,       // color_t (R, G, B)
