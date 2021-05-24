@@ -4,12 +4,12 @@
  *
  *  Streaming channel
  *  This structure manage a ring buffer as a streaming channel.
- * 
+ *
  *   |--------------------- ring_buffer_size --------------------|
  *   |*****************|...............|                         |
  *   ^                 ^               ^                         ^
  * ring_buffer    sample_ptr       data_ptr               end_ring_buffer
- * 
+ *
  * @author Luos
  * @version 0.0.0
  ******************************************************************************/
@@ -40,6 +40,8 @@ void Stream_ResetStreamingChannel(streaming_channel_t *stream);
 uint8_t Stream_PutSample(streaming_channel_t *stream, const void *data, uint16_t size);
 uint8_t Stream_GetSample(streaming_channel_t *stream, void *data, uint16_t size);
 uint8_t Stream_GetAvailableSampleNB(streaming_channel_t *stream);
-uint8_t Stream_SetAvailableSampleNB(streaming_channel_t *stream, uint16_t size);
+uint8_t Stream_GetAvailableSampleNBUntilEndBuffer(streaming_channel_t *stream);
+uint8_t Stream_AddAvailableSampleNB(streaming_channel_t *stream, uint16_t size);
+uint8_t Stream_RmvAvailableSampleNB(streaming_channel_t *stream, uint16_t size);
 
 #endif /* LUOS_H */
