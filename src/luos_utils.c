@@ -36,7 +36,7 @@ __attribute__((weak)) void node_assert(char *file, uint32_t line)
 void Luos_assert(char *file, uint32_t line)
 {
     // prepare a message as a node.
-    // To do that we have to reset the container ID and clear PTP states to unlock others.
+    // To do that we have to reset the service ID and clear PTP states to unlock others.
     PortMng_Init();
     // completely reinit the allocator
     MsgAlloc_Init(NULL);

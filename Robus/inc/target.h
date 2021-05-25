@@ -20,7 +20,7 @@
 /*******************************************************************************
  * Function
  ******************************************************************************/
-uint8_t Trgt_MulticastTargetBank(ll_container_t *ll_container, uint16_t val);
-void Trgt_AddMulticastTarget(ll_container_t *ll_container, uint16_t target);
+uint8_t Trgt_MulticastTargetBank(ll_service_t *ll_service, uint16_t val);
+void Trgt_AddMulticastTarget(ll_service_t *ll_service, uint16_t target);
 
 #endif /* _TARGET_H_ */

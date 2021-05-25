@@ -1,11 +1,11 @@
 /******************************************************************************
- * @file containers structure
+ * @file services structure
  * @brief describs all the
  * @author Luos
  * @version 0.0.0
  ******************************************************************************/
-#ifndef __CONTAINER_STRUCT_H
-#define __CONTAINER_STRUCT_H
+#ifndef __SERVICE_STRUCT_H
+#define __SERVICE_STRUCT_H
 
 #include <stdint.h>
 #include "luos.h"
@@ -29,7 +29,7 @@ typedef struct __attribute__((__packed__))
         uint8_t unmap[sizeof(memory_stats_t) + 1]; /*!< streamable form. */
     };
 } luos_stats_t;
-/* This structure is used to create containers version
+/* This structure is used to create services version
  * please refer to the documentation
  */
 typedef struct __attribute__((__packed__))
@@ -45,10 +45,10 @@ typedef struct __attribute__((__packed__))
         uint8_t unmap[3]; /*!< streamable form. */
     };
 } revision_t;
-/* This structure is used to manage containers statistic
+/* This structure is used to manage services statistic
  * please refer to the documentation
  */
-typedef struct __attribute__((__packed__)) container_stats_t
+typedef struct __attribute__((__packed__)) service_stats_t
 {
     union
     {
@@ -58,9 +58,9 @@ typedef struct __attribute__((__packed__)) container_stats_t
         };
         uint8_t unmap[1]; /*!< streamable form. */
     };
-} container_stats_t;
+} service_stats_t;
 
-/* This structure is used to manage containers timed auto update
+/* This structure is used to manage services timed auto update
  * please refer to the documentation
  */
 typedef struct __attribute__((__packed__)) timed_update_t
@@ -70,24 +70,24 @@ typedef struct __attribute__((__packed__)) timed_update_t
     uint16_t target;
 } timed_update_t;
 
-/* This structure is used to manage containers
+/* This structure is used to manage services
  * please refer to the documentation
  */
-typedef struct __attribute__((__packed__)) container_t
+typedef struct __attribute__((__packed__)) service_t
 {
-    ll_container_t *ll_container;
+    ll_service_t *ll_service;
     // Callback
-    void (*cont_cb)(struct container_t *container, msg_t *msg);
+    void (*cont_cb)(struct service_t *service, msg_t *msg);
     // Variables
-    uint8_t default_alias[MAX_ALIAS_SIZE]; /*!< container default alias. */
-    uint8_t alias[MAX_ALIAS_SIZE];         /*!< container alias. */
-    timed_update_t auto_refresh;           /*!< container auto refresh context. */
-    revision_t revision;                   /*!< container firmware version. */
+    uint8_t default_alias[MAX_ALIAS_SIZE]; /*!< service default alias. */
+    uint8_t alias[MAX_ALIAS_SIZE];         /*!< service alias. */
+    timed_update_t auto_refresh;           /*!< service auto refresh context. */
+    revision_t revision;                   /*!< service firmware version. */
     luos_stats_t *node_statistics;         /*!< Node level statistics. */
-    container_stats_t statistics;          /*!< container level statistics. */
-} container_t;
+    service_stats_t statistics;            /*!< service level statistics. */
+} service_t;
 
-typedef void (*CONT_CB)(container_t *container, msg_t *msg);
+typedef void (*CONT_CB)(service_t *service, msg_t *msg);
 
 /*
  * Control modes
@@ -136,4 +136,4 @@ typedef struct __attribute__((__packed__))
  * Function
  ******************************************************************************/
 
-#endif /*__CONTAINER_STRUCT_H */
+#endif /*__SERVICE_STRUCT_H */

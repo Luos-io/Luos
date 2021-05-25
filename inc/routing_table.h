@@ -15,15 +15,15 @@
 
 typedef enum
 {
-    CLEAR,     // No content
-    CONTAINER, // Contain a container informations
-    NODE,      // Contain a node informations
+    CLEAR,   // No content
+    SERVICE, // Contain a service informations
+    NODE,    // Contain a node informations
 } entry_mode_t;
 /*******************************************************************************
  * Variables
  ******************************************************************************/
 
-/* This structure is used to receive or send messages between containers in slave
+/* This structure is used to receive or send messages between services in slave
  * and master mode.
  * please refer to the documentation
  */
@@ -33,10 +33,10 @@ typedef struct __attribute__((__packed__))
     union
     {
         struct __attribute__((__packed__))
-        {                               // CONTAINER mode entry
-            uint16_t id;                // Container ID.
-            uint16_t type;              // Container type.
-            char alias[MAX_ALIAS_SIZE]; // Container alias.
+        {                               // SERVICE mode entry
+            uint16_t id;                // Service ID.
+            uint16_t type;              // Service type.
+            char alias[MAX_ALIAS_SIZE]; // Service alias.
         };
         struct __attribute__((__packed__))
         { // NODE mode entry
@@ -61,25 +61,25 @@ typedef struct __attribute__((__packed__))
 // ********************* routing_table search tools ************************
 uint16_t RoutingTB_IDFromAlias(char *alias);
 uint16_t RoutingTB_IDFromType(luos_type_t type);
-uint16_t RoutingTB_IDFromContainer(container_t *container);
+uint16_t RoutingTB_IDFromService(service_t *service);
 char *RoutingTB_AliasFromId(uint16_t id);
 luos_type_t RoutingTB_TypeFromID(uint16_t id);
 luos_type_t RoutingTB_TypeFromAlias(char *alias);
 char *RoutingTB_StringFromType(luos_type_t type);
-uint8_t RoutingTB_ContainerIsSensor(luos_type_t type);
+uint8_t RoutingTB_ServiceIsSensor(luos_type_t type);
 uint16_t RoutingTB_GetNodeNB(void);
 uint16_t RoutingTB_GetNodeID(uint16_t index);
 
 // ********************* routing_table management tools ************************
 void RoutingTB_ComputeRoutingTableEntryNB(void);
-void RoutingTB_DetectContainers(container_t *container);
+void RoutingTB_DetectServices(service_t *service);
 void RoutingTB_ConvertNodeToRoutingTable(routing_table_t *entry, node_t *node);
-void RoutingTB_ConvertContainerToRoutingTable(routing_table_t *entry, container_t *container);
+void RoutingTB_ConvertServiceToRoutingTable(routing_table_t *entry, service_t *service);
 void RoutingTB_RemoveNode(uint16_t nodeid);
 void RoutingTB_RemoveOnRoutingTable(uint16_t id);
 void RoutingTB_Erase(void);
 routing_table_t *RoutingTB_Get(void);
-uint16_t RoutingTB_GetLastContainer(void);
+uint16_t RoutingTB_GetLastService(void);
 uint16_t *RoutingTB_GetLastNode(void);
 uint16_t RoutingTB_GetLastEntry(void);
 

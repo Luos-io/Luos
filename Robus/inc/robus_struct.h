@@ -47,12 +47,12 @@ typedef struct __attribute__((__packed__))
  */
 typedef enum
 {
-    ID,        /*!< Unique or virtual ID, used to send something to only one container. */
+    ID,        /*!< Unique or virtual ID, used to send something to only one service. */
     IDACK,     /*!< Unique or virtual ID with reception Acknoledgment (ACK). */
-    TYPE,      /*!< Type mode, used to send something to all container of the same type. */
+    TYPE,      /*!< Type mode, used to send something to all service of the same type. */
     BROADCAST, /*!< Broadcast mode, used to send something to everybody. */
-    MULTICAST, /*!< Multicast mode, used to send something to multiple containers. */
-    NODEID,    /*!< Node mode, used to send something to all containers of a node. */
+    MULTICAST, /*!< Multicast mode, used to send something to multiple services. */
+    NODEID,    /*!< Node mode, used to send something to all services of a node. */
     NODEIDACK  /*!< Node mode with reception Acknoledgment (ACK). */
 } target_mode_t;
 
@@ -76,7 +76,7 @@ typedef struct __attribute__((__packed__))
     };
 } header_t;
 
-/* This structure is used to receive or send messages between containers in slave
+/* This structure is used to receive or send messages between services in slave
  * and master mode.
  * please refer to the documentation
  */
@@ -93,24 +93,24 @@ typedef struct __attribute__((__packed__))
     };
 } msg_t;
 
-/* This structure is used to manage virtual containers
+/* This structure is used to manage virtual services
  * please refer to the documentation
  */
 typedef struct __attribute__((__packed__))
 {
 
-    // Container infomations
-    uint16_t id;   /*!< Container ID. */
-    uint16_t type; /*!< Container type. */
+    // Service infomations
+    uint16_t id;   /*!< Service ID. */
+    uint16_t type; /*!< Service type. */
 
     // Variables
     uint16_t max_multicast_target;                         /*!< Position pointer of the last multicast target. */
     uint16_t multicast_target_bank[MAX_MULTICAST_ADDRESS]; /*!< multicast target bank. */
-    uint16_t dead_container_spotted;                       /*!< The ID of a container that don't reply to a lot of ACK msg */
+    uint16_t dead_service_spotted;                         /*!< The ID of a service that don't reply to a lot of ACK msg */
 
-    //variable stat on robus com for ll_container
+    //variable stat on robus com for ll_service
     ll_stats_t ll_stat;
-} ll_container_t;
+} ll_service_t;
 
 /******************************************************************************
  * @struct error_return_t
@@ -153,7 +153,7 @@ typedef enum
     ROBUS_PROTOCOL_NB,
 } robus_cmd_t;
 
-typedef void (*RX_CB)(ll_container_t *ll_container, msg_t *msg);
+typedef void (*RX_CB)(ll_service_t *ll_service, msg_t *msg);
 /*******************************************************************************
  * Variables
  ******************************************************************************/

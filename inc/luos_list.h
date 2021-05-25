@@ -42,14 +42,14 @@ typedef enum
     NODE_UUID,                   // luos_uuid_t
 
     // Revision management
-    REVISION,        // container sends its firmware revision
-    LUOS_REVISION,   // container sends its luos revision
-    LUOS_STATISTICS, // container sends its luos revision
+    REVISION,        // service sends its firmware revision
+    LUOS_REVISION,   // service sends its luos revision
+    LUOS_STATISTICS, // service sends its luos revision
 
     // ************* End of Luos managed commands ****************
 
-    // Common register for all containers
-    GET_CMD,               // asks a container to publish its data
+    // Common register for all services
+    GET_CMD,               // asks a service to publish its data
     ASK_PUB_CMD = GET_CMD, // retrocompatibility line
     SET_CMD,               // set some undefined data
 
@@ -106,7 +106,7 @@ typedef enum
     // Specific register
     DXL_WHEELMODE,      // char (True/False) TODO => should be managed by MOTOR_REPORT the same way as controller motor
     HANDY_SET_POSITION, // handy_t
-    PARAMETERS,         // depend on the container, can be : servo_parameters_t, imu_report_t, motor_mode_t
+    PARAMETERS,         // depend on the service, can be : servo_parameters_t, imu_report_t, motor_mode_t
 
     // compatibility area
     LUOS_PROTOCOL_NB,

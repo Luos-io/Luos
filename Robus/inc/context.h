@@ -24,9 +24,9 @@ typedef struct
     TxCom_t tx;     /*!< Transmitter informations. */
     PortMng_t port; /*!< port informations. */
 
-    //Virtual container management
-    ll_container_t ll_container_table[MAX_CONTAINER_NUMBER]; /*!< Virtual Container table. */
-    uint16_t ll_container_number;                            /*!< Virtual Container number. */
+    //Virtual service management
+    ll_service_t ll_service_table[MAX_SERVICE_NUMBER]; /*!< Virtual Service table. */
+    uint16_t ll_service_number;                        /*!< Virtual Service number. */
 
 } context_t;
 

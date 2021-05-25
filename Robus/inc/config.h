@@ -24,8 +24,8 @@
 #define NBR_RETRY 10
 #endif
 
-#ifndef MAX_CONTAINER_NUMBER
-#define MAX_CONTAINER_NUMBER 5
+#ifndef MAX_SERVICE_NUMBER
+#define MAX_SERVICE_NUMBER 5
 #endif
 
 #ifndef MSG_BUFFER_SIZE
@@ -33,7 +33,7 @@
 #endif
 
 #ifndef MAX_MSG_NB
-#define MAX_MSG_NB 2 * MAX_CONTAINER_NUMBER
+#define MAX_MSG_NB 2 * MAX_SERVICE_NUMBER
 #endif
 
 #ifndef NBR_PORT

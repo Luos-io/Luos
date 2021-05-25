@@ -20,27 +20,27 @@
 
 /******************************************************************************
  * @brief lookink for a bank of target in multicast mode
- * @param container in multicast
+ * @param service in multicast
  * @param multicast bank
  * @return Error
  ******************************************************************************/
-uint8_t Trgt_MulticastTargetBank(ll_container_t *ll_container, uint16_t val)
+uint8_t Trgt_MulticastTargetBank(ll_service_t *ll_service, uint16_t val)
 {
     unsigned char i;
-    for (i = 0; i < ll_container->max_multicast_target; i++)
+    for (i = 0; i < ll_service->max_multicast_target; i++)
     {
-        if (ll_container->multicast_target_bank[i] == val)
+        if (ll_service->multicast_target_bank[i] == val)
             return true;
     }
     return false;
 }
 /******************************************************************************
  * @brief add a target to the bank
- * @param container in multicast
+ * @param service in multicast
  * @param target to add
  * @return Error
  ******************************************************************************/
-void Trgt_AddMulticastTarget(ll_container_t *ll_container, uint16_t target)
+void Trgt_AddMulticastTarget(ll_service_t *ll_service, uint16_t target)
 {
-    ll_container->multicast_target_bank[ll_container->max_multicast_target++] = target;
+    ll_service->multicast_target_bank[ll_service->max_multicast_target++] = target;
 }

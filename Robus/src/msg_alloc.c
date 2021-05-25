@@ -36,7 +36,7 @@
  *              This event pull msg_tasks tasks and interpret all messages to
  *              create one or more Luos_tasks.
  *  - Task D  : This is all msg trait by Luos Library interpret in Luos_loop. Msg can be
- *              for Luos Library or for container. this is executed outside of IT.
+ *              for Luos Library or for service. this is executed outside of IT.
  *  - Task E  : Msg_buffer can also save some TX tasks and list them into tx_task tasks
  *
  * After all of it Luos_tasks are ready to be managed by luos_loop execution.
@@ -62,16 +62,16 @@
  ******************************************************************************/
 typedef struct __attribute__((__packed__))
 {
-    msg_t *msg_pt;                   /*!< Start pointer of the msg on msg_buffer. */
-    ll_container_t *ll_container_pt; /*!< Pointer to the concerned ll_container. */
+    msg_t *msg_pt;               /*!< Start pointer of the msg on msg_buffer. */
+    ll_service_t *ll_service_pt; /*!< Pointer to the concerned ll_service. */
 } luos_task_t;
 
 typedef struct
 {
-    uint8_t *data_pt;                /*!< Start pointer of the data on msg_buffer. */
-    uint16_t size;                   /*!< size of the data. */
-    ll_container_t *ll_container_pt; /*!< Pointer to the transmitting ll_container. */
-    uint8_t localhost;               /*!< is this message a localhost one? */
+    uint8_t *data_pt;            /*!< Start pointer of the data on msg_buffer. */
+    uint16_t size;               /*!< size of the data. */
+    ll_service_t *ll_service_pt; /*!< Pointer to the transmitting ll_service. */
+    uint8_t localhost;           /*!< is this message a localhost one? */
 } tx_task_t;
 /*******************************************************************************
  * Variables
@@ -645,8 +645,8 @@ static inline void MsgAlloc_ClearLuosTask(uint16_t luos_task_id)
     if (luos_tasks_stack_id != 0)
     {
         luos_tasks_stack_id--;
-        luos_tasks[luos_tasks_stack_id].msg_pt          = 0;
-        luos_tasks[luos_tasks_stack_id].ll_container_pt = 0;
+        luos_tasks[luos_tasks_stack_id].msg_pt        = 0;
+        luos_tasks[luos_tasks_stack_id].ll_service_pt = 0;
     }
     LuosHAL_SetIrqState(true);
     MsgAlloc_FindNewOldestMsg();
@@ -657,7 +657,7 @@ static inline void MsgAlloc_ClearLuosTask(uint16_t luos_task_id)
  * @param module_concerned_by_current_msg concerned msg
  * @return None
  ******************************************************************************/
-void MsgAlloc_LuosTaskAlloc(ll_container_t *container_concerned_by_current_msg, msg_t *concerned_msg)
+void MsgAlloc_LuosTaskAlloc(ll_service_t *service_concerned_by_current_msg, msg_t *concerned_msg)
 {
     // find a free slot
     if (luos_tasks_stack_id == MAX_MSG_NB)
@@ -672,8 +672,8 @@ void MsgAlloc_LuosTaskAlloc(ll_container_t *container_concerned_by_current_msg, 
     }
     // fill the informations of the message in this slot
     LuosHAL_SetIrqState(false);
-    luos_tasks[luos_tasks_stack_id].msg_pt          = concerned_msg;
-    luos_tasks[luos_tasks_stack_id].ll_container_pt = container_concerned_by_current_msg;
+    luos_tasks[luos_tasks_stack_id].msg_pt        = concerned_msg;
+    luos_tasks[luos_tasks_stack_id].ll_service_pt = service_concerned_by_current_msg;
     if (luos_tasks_stack_id == 0)
     {
         MsgAlloc_OldestMsgCandidate(luos_tasks[0].msg_pt);
@@ -698,13 +698,13 @@ void MsgAlloc_LuosTaskAlloc(ll_container_t *container_concerned_by_current_msg, 
  * @param returned_msg : The message pointer.
  * @return error_return_t
  ******************************************************************************/
-error_return_t MsgAlloc_PullMsg(ll_container_t *target_module, msg_t **returned_msg)
+error_return_t MsgAlloc_PullMsg(ll_service_t *target_module, msg_t **returned_msg)
 {
     MsgAlloc_ValidDataIntegrity();
     //find the oldest message allocated to this module
     for (uint16_t i = 0; i < luos_tasks_stack_id; i++)
     {
-        if (luos_tasks[i].ll_container_pt == target_module)
+        if (luos_tasks[i].ll_service_pt == target_module)
         {
             *returned_msg = luos_tasks[i].msg_pt;
             // Clear the slot by sliding others to the left on it
@@ -743,12 +743,12 @@ error_return_t MsgAlloc_PullMsgFromLuosTask(uint16_t luos_task_id, msg_t **retur
  * @param luos_task_id : Id of the allocator slot
  * @return error_return_t : Fail is there is no more message available.
  ******************************************************************************/
-error_return_t MsgAlloc_LookAtLuosTask(uint16_t luos_task_id, ll_container_t **allocated_module)
+error_return_t MsgAlloc_LookAtLuosTask(uint16_t luos_task_id, ll_service_t **allocated_module)
 {
     MsgAlloc_ValidDataIntegrity();
     if (luos_task_id < luos_tasks_stack_id)
     {
-        *allocated_module = luos_tasks[luos_task_id].ll_container_pt;
+        *allocated_module = luos_tasks[luos_task_id].ll_service_pt;
         return SUCCEED;
     }
     return FAILED;
@@ -836,7 +836,7 @@ void MsgAlloc_ClearMsgFromLuosTasks(msg_t *msg)
  * @param data to transmit
  * @param size of the data to transmit
  ******************************************************************************/
-error_return_t MsgAlloc_SetTxTask(ll_container_t *ll_container_pt, uint8_t *data, uint16_t crc, uint16_t size, luos_localhost_t localhost, uint8_t ack)
+error_return_t MsgAlloc_SetTxTask(ll_service_t *ll_service_pt, uint8_t *data, uint16_t crc, uint16_t size, luos_localhost_t localhost, uint8_t ack)
 {
     LUOS_ASSERT((tx_tasks_stack_id >= 0) && (tx_tasks_stack_id < MAX_MSG_NB) && ((uint32_t)data > 0) && ((uint32_t)current_msg < (uint32_t)&msg_buffer[MSG_BUFFER_SIZE]) && ((uint32_t)current_msg >= (uint32_t)&msg_buffer[0]));
     void *rx_msg_bkp          = 0;
@@ -943,10 +943,10 @@ error_return_t MsgAlloc_SetTxTask(ll_container_t *ll_container_pt, uint8_t *data
 #endif
         // Now we are ready to transmit, we can create the tx task
         LuosHAL_SetIrqState(false);
-        tx_tasks[tx_tasks_stack_id].size            = size;
-        tx_tasks[tx_tasks_stack_id].data_pt         = (uint8_t *)tx_msg;
-        tx_tasks[tx_tasks_stack_id].ll_container_pt = ll_container_pt;
-        tx_tasks[tx_tasks_stack_id].localhost       = (localhost != EXTERNALHOST);
+        tx_tasks[tx_tasks_stack_id].size          = size;
+        tx_tasks[tx_tasks_stack_id].data_pt       = (uint8_t *)tx_msg;
+        tx_tasks[tx_tasks_stack_id].ll_service_pt = ll_service_pt;
+        tx_tasks[tx_tasks_stack_id].localhost     = (localhost != EXTERNALHOST);
         // Check if last tx task is the oldest msg of the buffer
         if (tx_tasks_stack_id == 0)
         {
@@ -1015,17 +1015,17 @@ void MsgAlloc_PullMsgFromTxTask(void)
     MsgAlloc_FindNewOldestMsg();
 }
 /******************************************************************************
- * @brief remove all transmit task of a specific container
+ * @brief remove all transmit task of a specific service
  * @param None
  ******************************************************************************/
-void MsgAlloc_PullContainerFromTxTask(uint16_t container_id)
+void MsgAlloc_PullServiceFromTxTask(uint16_t service_id)
 {
     LUOS_ASSERT((tx_tasks_stack_id > 0) && (tx_tasks_stack_id < MAX_MSG_NB));
     uint8_t task_id = 0;
     // check all task
     while (task_id < tx_tasks_stack_id)
     {
-        if (((msg_t *)tx_tasks[task_id].data_pt)->header.target == container_id)
+        if (((msg_t *)tx_tasks[task_id].data_pt)->header.target == service_id)
         {
             // Decay tasks
             for (uint8_t i = task_id; i < tx_tasks_stack_id; i++)
@@ -1053,22 +1053,22 @@ void MsgAlloc_PullContainerFromTxTask(uint16_t container_id)
 }
 /******************************************************************************
  * @brief return a message to transmit
- * @param ll_container_pt container sending this data
+ * @param ll_service_pt service sending this data
  * @param data to send
  * @param size of the data to send
  * @param localhost is this message a localhost one
  * @return error_return_t : Fail is there is no more message available.
  ******************************************************************************/
-error_return_t MsgAlloc_GetTxTask(ll_container_t **ll_container_pt, uint8_t **data, uint16_t *size, uint8_t *localhost)
+error_return_t MsgAlloc_GetTxTask(ll_service_t **ll_service_pt, uint8_t **data, uint16_t *size, uint8_t *localhost)
 {
     LUOS_ASSERT(tx_tasks_stack_id < MAX_MSG_NB);
     MsgAlloc_ValidDataIntegrity();
     if (tx_tasks_stack_id > 0)
     {
-        *data            = tx_tasks[0].data_pt;
-        *size            = tx_tasks[0].size;
-        *ll_container_pt = tx_tasks[0].ll_container_pt;
-        *localhost       = tx_tasks[0].localhost;
+        *data          = tx_tasks[0].data_pt;
+        *size          = tx_tasks[0].size;
+        *ll_service_pt = tx_tasks[0].ll_service_pt;
+        *localhost     = tx_tasks[0].localhost;
         return SUCCEED;
     }
     return FAILED;

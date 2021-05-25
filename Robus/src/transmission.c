@@ -25,7 +25,7 @@
  *                           |               |                       |Process  |       |       +-----v-----+
  *                      +----v-----+         |                       |   +-----v-----+ |       | Pass data |
  *                      | Exclude  |         |                       |   |    Get    | |   ^   |   to RX   |
- *                      |container |---------+                       |   | TX_tasks  |-+---+   +-----------+
+ *                      |service |---------+                       |   | TX_tasks  |-+---+   +-----------+
  *                      +----------+                                 |   +-----------+ No task       |
  *                                                                   |         |       |       +-----v-----+
  *                                                                   |   +-----v-----+ |       | TX_status |      ^
@@ -89,28 +89,28 @@ void Transmit_Process()
     uint8_t *data = 0;
     uint16_t size;
     uint8_t localhost;
-    ll_container_t *ll_container_pt;
-    if ((MsgAlloc_GetTxTask(&ll_container_pt, &data, &size, &localhost) == SUCCEED) && (Transmit_GetLockStatus() == false))
+    ll_service_t *ll_service_pt;
+    if ((MsgAlloc_GetTxTask(&ll_service_pt, &data, &size, &localhost) == SUCCEED) && (Transmit_GetLockStatus() == false))
     {
         // We have something to send
         // Check if we already try to send it multiple times and save it on stats if it is
-        if ((*ll_container_pt->ll_stat.max_retry < nbrRetry) || (nbrRetry >= NBR_RETRY))
+        if ((*ll_service_pt->ll_stat.max_retry < nbrRetry) || (nbrRetry >= NBR_RETRY))
         {
-            *ll_container_pt->ll_stat.max_retry = nbrRetry;
-            if (*ll_container_pt->ll_stat.max_retry >= NBR_RETRY)
+            *ll_service_pt->ll_stat.max_retry = nbrRetry;
+            if (*ll_service_pt->ll_stat.max_retry >= NBR_RETRY)
             {
                 // We failed to transmit this message. We can't allow it, there is a issue on this target.
-                // If it was an ACK issue, save the target as dead container into the sending ll_container
+                // If it was an ACK issue, save the target as dead service into the sending ll_service
                 if (ctx.tx.collision)
                 {
-                    ll_container_pt->dead_container_spotted = (uint16_t)(((msg_t *)data)->header.target);
+                    ll_service_pt->dead_service_spotted = (uint16_t)(((msg_t *)data)->header.target);
                 }
                 nbrRetry         = 0;
                 ctx.tx.collision = false;
                 // Remove all transmist messages of this specific target
-                MsgAlloc_PullContainerFromTxTask((uint16_t)(((msg_t *)data)->header.target));
-                // Try to get a tx_task for another container
-                if (MsgAlloc_GetTxTask(&ll_container_pt, &data, &size, &localhost) == FAILED)
+                MsgAlloc_PullServiceFromTxTask((uint16_t)(((msg_t *)data)->header.target));
+                // Try to get a tx_task for another service
+                if (MsgAlloc_GetTxTask(&ll_service_pt, &data, &size, &localhost) == FAILED)
                 {
                     // Nothing to transmit anymore, just exit.
                     return;
@@ -145,7 +145,7 @@ void Transmit_Process()
     }
 }
 /******************************************************************************
- * @brief Send ID to others container on network
+ * @brief Send ID to others service on network
  * @param None
  * @return lock status
  ******************************************************************************/
