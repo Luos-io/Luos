@@ -51,7 +51,6 @@ typedef enum
     // Common register for all containers
     GET_CMD,               // asks a container to publish its data
     ASK_PUB_CMD = GET_CMD, // retrocompatibility line
-    SET_CMD,               // set some undefined data
 
     // Generic data
     COLOR,       // color_t (R, G, B)
@@ -107,6 +106,9 @@ typedef enum
     DXL_WHEELMODE,      // char (True/False) TODO => should be managed by MOTOR_REPORT the same way as controller motor
     HANDY_SET_POSITION, // handy_t
     PARAMETERS,         // depend on the container, can be : servo_parameters_t, imu_report_t, motor_mode_t
+
+    // Compatibility zone
+    SET_CMD, // set some undefined data
 
     // compatibility area
     LUOS_PROTOCOL_NB,
