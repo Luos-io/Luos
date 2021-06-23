@@ -57,15 +57,15 @@ void Stream_ResetStreamingChannel(streaming_channel_t *stream)
  * @param size The number of data to copy
  * @return number of available samples
  ******************************************************************************/
-uint8_t Stream_PutSample(streaming_channel_t *stream, const void *data, uint16_t size)
+uint16_t Stream_PutSample(streaming_channel_t *stream, const void *data, uint16_t size)
 {
-    if (((size * stream->data_size) + stream->data_ptr) > stream->end_ring_buffer)
+    // check if we exceed ring buffer capacity
+    LUOS_ASSERT((Stream_GetAvailableSampleNB(stream) + size) <= (stream->end_ring_buffer - stream->ring_buffer));
+    if (((size * stream->data_size) + stream->data_ptr) >= stream->end_ring_buffer)
     {
         // our data exceeds ring buffer end, cut it and copy.
         uint16_t chunk1 = stream->end_ring_buffer - stream->data_ptr;
         uint16_t chunk2 = (size * stream->data_size) - chunk1;
-        // check if we exceed ring buffer capacity
-        LUOS_ASSERT(stream->sample_ptr >= (stream->ring_buffer + chunk2));
         // Everything good copy datas.
         memcpy(stream->data_ptr, data, chunk1);
         memcpy(stream->ring_buffer, (char *)data + chunk1, chunk2);
@@ -75,8 +75,6 @@ uint8_t Stream_PutSample(streaming_channel_t *stream, const void *data, uint16_t
     else
     {
         // our data fit before ring buffer end
-        // check if we exceed ring buffer capacity
-        LUOS_ASSERT((stream->data_ptr >= stream->sample_ptr) && ((stream->data_ptr + (size * stream->data_size)) <= stream->end_ring_buffer));
         memcpy(stream->data_ptr, data, (size * stream->data_size));
         // Set the new data pointer
         stream->data_ptr = stream->data_ptr + (size * stream->data_size);
@@ -90,7 +88,7 @@ uint8_t Stream_PutSample(streaming_channel_t *stream, const void *data, uint16_t
  * @param size data
  * @return None
  ******************************************************************************/
-uint8_t Stream_GetSample(streaming_channel_t *stream, void *data, uint16_t size)
+uint16_t Stream_GetSample(streaming_channel_t *stream, void *data, uint16_t size)
 {
     uint16_t nb_available_samples = Stream_GetAvailableSampleNB(stream);
     if (nb_available_samples >= size)
@@ -127,13 +125,76 @@ uint8_t Stream_GetSample(streaming_channel_t *stream, void *data, uint16_t size)
  * @param stream streaming channel pointer
  * @return number of available samples
  ******************************************************************************/
-uint8_t Stream_GetAvailableSampleNB(streaming_channel_t *stream)
+uint16_t Stream_GetAvailableSampleNB(streaming_channel_t *stream)
 {
-    uint16_t nb_available_sample = (stream->data_ptr - stream->sample_ptr) / stream->data_size;
+    int16_t nb_available_sample = (stream->data_ptr - stream->sample_ptr) / stream->data_size;
     if (nb_available_sample < 0)
     {
         // The buffer have looped
         nb_available_sample = ((stream->end_ring_buffer - stream->sample_ptr) + (stream->data_ptr - stream->ring_buffer)) / stream->data_size;
     }
-    return nb_available_sample;
+    LUOS_ASSERT(nb_available_sample >= 0);
+    return (uint16_t)nb_available_sample;
+}
+/******************************************************************************
+ * @brief set a number of sample available in buffer
+ * @param stream streaming channel pointer
+ * @param size The number of data to copy
+ * @return number of available samples
+ ******************************************************************************/
+uint16_t Stream_GetAvailableSampleNBUntilEndBuffer(streaming_channel_t *stream)
+{
+    int16_t nb_available_sample = (stream->data_ptr - stream->sample_ptr) / stream->data_size;
+    if (nb_available_sample < 0)
+    {
+        // The buffer have looped
+        nb_available_sample = (stream->end_ring_buffer - stream->sample_ptr) / stream->data_size;
+    }
+    LUOS_ASSERT(nb_available_sample >= 0);
+    return (uint16_t)nb_available_sample;
+}
+/******************************************************************************
+ * @brief set a number of sample available in buffer
+ * @param stream streaming channel pointer
+ * @param size The number of data to copy
+ * @return number of available samples
+ ******************************************************************************/
+uint16_t Stream_AddAvailableSampleNB(streaming_channel_t *stream, uint16_t size)
+{
+    LUOS_ASSERT((uint32_t)(Stream_GetAvailableSampleNB(stream) + size) < (uint32_t)(stream->end_ring_buffer - stream->ring_buffer));
+    if (((size * stream->data_size) + stream->data_ptr) > stream->end_ring_buffer)
+    {
+        uint16_t chunk1  = stream->end_ring_buffer - stream->data_ptr;
+        uint16_t chunk2  = (size * stream->data_size) - chunk1;
+        stream->data_ptr = stream->ring_buffer + chunk2;
+    }
+    else
+    {
+        stream->data_ptr = stream->data_ptr + (size * stream->data_size);
+    }
+    return Stream_GetAvailableSampleNB(stream);
+}
+/******************************************************************************
+ * @brief set a number of sample available in buffer
+ * @param stream streaming channel pointer
+ * @param size The number of data to copy
+ * @return number of available samples
+ ******************************************************************************/
+uint16_t Stream_RmvAvailableSampleNB(streaming_channel_t *stream, uint16_t size)
+{
+    if (((size * stream->data_size) + stream->sample_ptr) > stream->end_ring_buffer)
+    {
+        uint16_t chunk1    = stream->end_ring_buffer - stream->sample_ptr;
+        uint16_t chunk2    = (size * stream->data_size) - chunk1;
+        stream->sample_ptr = stream->ring_buffer + chunk2;
+    }
+    else
+    {
+        stream->sample_ptr = stream->sample_ptr + (size * stream->data_size);
+        if (stream->sample_ptr == stream->end_ring_buffer)
+        {
+            stream->sample_ptr = stream->ring_buffer;
+        }
+    }
+    return Stream_GetAvailableSampleNB(stream);
 }
