@@ -29,6 +29,11 @@ uint16_t data_count = 0;
 uint16_t data_size  = 0;
 uint16_t crc_val    = 0;
 
+#ifdef SNIFFER_H
+uint64_t error_count     = 0;
+uint64_t collision_count = 0;
+#endif /* SNIFFER_H */
+
 /*******************************************************************************
  * Function
  ******************************************************************************/
@@ -109,6 +114,9 @@ void Recep_GetHeader(volatile uint8_t *data)
             else
             {
                 MsgAlloc_ValidHeader(false, data_size);
+#ifdef SNIFFER_H
+                error_count++;
+#endif /* SNIFFER_H */
                 ctx.rx.callback = Recep_Drop;
                 return;
             }
@@ -157,7 +165,7 @@ void Recep_GetData(volatile uint8_t *data)
             }
 #else   //in case of a sniffer we dont send an ACK
             MsgAlloc_EndMsg();
-#endif
+#endif /* SNIFFER_H */
         }
         else
         {
@@ -167,7 +175,9 @@ void Recep_GetData(volatile uint8_t *data)
             {
                 Transmit_SendAck();
             }
-#endif
+#else
+            error_count++;
+#endif /* SNIFFER_H */
             MsgAlloc_InvalidMsg();
         }
         ctx.rx.callback = Recep_Drop;
@@ -187,6 +197,9 @@ void Recep_GetCollision(volatile uint8_t *data)
     {
         // Data dont match, or we don't start to send the message, there is a collision
         ctx.tx.collision = true;
+#ifdef SNIFFER_H
+        collision_count++;
+#endif /* SNIFFER_H */
         // Stop TX trying to save input datas
         LuosHAL_SetTxState(false);
         // Save the received data into the allocator to be able to continue the reception
@@ -470,3 +483,24 @@ void Recep_InterpretMsgProtocol(msg_t *msg)
             break;
     }
 }
+
+#ifdef SNIFFER_H
+/******************************************************************************
+ * @brief return the number of crc and bad header errors
+ * @param None
+ * @return global counter
+ ******************************************************************************/
+uint64_t Recep_GetErrorNum(void)
+{
+    return error_count;
+}
+/******************************************************************************
+ * @brief return the number of collisions
+ * @param None
+ * @return global counter
+ ******************************************************************************/
+uint64_t Recep_GetCollisionNum(void)
+{
+    return collision_count;
+}
+#endif /* SNIFFER_H */

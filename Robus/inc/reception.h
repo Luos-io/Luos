@@ -56,5 +56,9 @@ void Recep_Timeout(void);
 void Recep_InterpretMsgProtocol(msg_t *msg);
 uint8_t Recep_NodeConcerned(header_t *header);
 ll_container_t *Recep_GetConcernedLLContainer(header_t *header);
+#ifdef SNIFFER_H
+uint64_t Recep_GetErrorNum(void);
+uint64_t Recep_GetCollisionNum(void);
+#endif /* SNIFFER_H */
 
 #endif /* _RECEPTION_H_ */
