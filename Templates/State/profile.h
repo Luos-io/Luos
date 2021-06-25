@@ -1,27 +1,36 @@
 /******************************************************************************
- * @file Template servo motor
- * @brief servo motor container template
+ * @file Profile 
+ * @brief container profile
  * WARING : This h file should be only included by user code or profile_*.h codes
  * @author Luos
  * @version 0.0.0
  ******************************************************************************/
-#ifndef TEMPLATE_TEMPLATE_SERVO_MOTOR_H_
-#define TEMPLATE_TEMPLATE_SERVO_MOTOR_H_
+#ifndef PROFILE_H
+#define PROFILE_H
 
+#include <stdbool.h>
 #include "luos.h"
-#include "struct_servo_motor.h"
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-/*
- * motor object structure
- */
+
 typedef struct
 {
-    CONT_CB self;
-    profile_servo_motor_t profile;
-} template_servo_motor_t;
+    uint32_t size;
+    uint8_t *data;
+} profile_data_t;
+
+typedef struct
+{
+    luos_type_t type;
+    luos_cmd_t cmd;
+    char alias[MAX_ALIAS_SIZE];
+    revision_t revision;
+    access_t access;
+    profile_data_t profile_data;
+    CONT_CB profile_callback;
+} profile_t;
 
 /*******************************************************************************
  * Variables
@@ -30,7 +39,6 @@ typedef struct
 /*******************************************************************************
  * Function
  ******************************************************************************/
+container_t *Luos_LaunchProfile(profile_t *profile);
 
-container_t *TemplateServoMotor_CreateContainer(CONT_CB cont_cb, template_servo_motor_t *var, const char *alias, revision_t revision);
-
-#endif /* TEMPLATE_TEMPLATE_SERVO_MOTOR_H_ */
+#endif /* PROFILE_H_ */
