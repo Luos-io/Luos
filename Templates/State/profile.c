@@ -62,9 +62,9 @@ static void Profile_MsgHandler(container_t *container, msg_t *msg)
  * @param revision FW for the container (tab[MajorVersion,MinorVersion,Patch])
  * @return None
  ******************************************************************************/
-container_t *Luos_LaunchProfile(profile_t *profile)
+container_t *Luos_LaunchProfile(profile_t *profile, const char *alias, revision_t revision)
 {
-    container_t *container     = Luos_CreateContainer(Profile_MsgHandler, profile->type, profile->alias, profile->revision);
+    container_t *container     = Luos_CreateContainer(Profile_MsgHandler, profile->type, alias, revision);
     container->profile_context = (void *)profile;
     return container;
 }

@@ -8,20 +8,12 @@
  * @param revision_t revision
  * @return None
  ******************************************************************************/
-void Luos_LinkProfile(profile_t *profile, profile_state_t *profile_state, CONT_CB callback, const char *alias, revision_t revision)
+void Luos_LinkProfile(profile_t *profile, profile_state_t *profile_state, CONT_CB callback)
 {
     int i = 0;
 
-    profile->type = STATE_TYPE;
-    profile->cmd  = IO_STATE;
-    for (i = 0; i < MAX_ALIAS_SIZE - 1; i++)
-    {
-        profile->alias[i] = alias[i];
-        if (profile->alias[i] == '\0')
-            break;
-    }
-    profile->alias[i] = '\0';
-    memcpy(&profile->revision, &revision, sizeof(revision_t));
+    profile->type              = STATE_TYPE;
+    profile->cmd               = IO_STATE;
     profile->profile_data.size = sizeof(profile_state_t);
     profile->profile_data.data = (uint8_t *)profile_state;
     if (callback != 0)

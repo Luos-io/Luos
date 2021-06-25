@@ -25,8 +25,6 @@ typedef struct
 {
     luos_type_t type;
     luos_cmd_t cmd;
-    char alias[MAX_ALIAS_SIZE];
-    revision_t revision;
     access_t access;
     profile_data_t profile_data;
     CONT_CB profile_callback;
@@ -39,6 +37,6 @@ typedef struct
 /*******************************************************************************
  * Function
  ******************************************************************************/
-container_t *Luos_LaunchProfile(profile_t *profile);
+container_t *Luos_LaunchProfile(profile_t *profile, const char *alias, revision_t revision);
 
 #endif /* PROFILE_H_ */
