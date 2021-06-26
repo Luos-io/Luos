@@ -36,7 +36,6 @@ typedef struct __attribute__((__packed__))
         {                               // CONTAINER mode entry
             uint16_t id;                // Container ID.
             uint16_t type;              // Container type.
-            access_t access;            // Container Access
             char alias[MAX_ALIAS_SIZE]; // Container alias.
         };
         struct __attribute__((__packed__))
@@ -50,9 +49,9 @@ typedef struct __attribute__((__packed__))
                 uint16_t node_id : 12;  // Node id
                 uint16_t certified : 4; // True if the node have a certificate
             };
-            uint16_t port_table[(MAX_ALIAS_SIZE + 2 + 2 + sizeof(access_t) - 2) / 2]; // Node link table
+            uint16_t port_table[(MAX_ALIAS_SIZE + 2 + 2 - 2) / 2]; // Node link table
         };
-        uint8_t unmap_data[MAX_ALIAS_SIZE + 2 + 2 + sizeof(access_t)];
+        uint8_t unmap_data[MAX_ALIAS_SIZE + 2 + 2];
     };
 } routing_table_t;
 
