@@ -5,8 +5,8 @@
  * @author Luos
  * @version 0.0.0
  ******************************************************************************/
-#ifndef PROFILE_H
-#define PROFILE_H
+#ifndef PROFILE_CORE_H
+#define PROFILE_CORE_H
 
 #include <stdbool.h>
 #include "luos.h"
@@ -39,4 +39,4 @@ typedef struct
  ******************************************************************************/
 container_t *Luos_LaunchProfile(profile_t *profile, const char *alias, revision_t revision);
 
-#endif /* PROFILE_H_ */
+#endif /* PROFILE_CORE_H_ */

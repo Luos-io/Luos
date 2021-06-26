@@ -8,7 +8,7 @@
 #ifndef PROFILE_STATE_H
 #define PROFILE_STATE_H
 
-#include "profile.h"
+#include "profile_core.h"
 
 /*******************************************************************************
  * Definitions

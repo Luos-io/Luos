@@ -1,4 +1,4 @@
-#include "profile.h"
+#include "profile_core.h"
 
 /******************************************************************************
  * @brief function converting Luos messages into data and reverse.
@@ -44,7 +44,7 @@ static void Profile_MsgHandler(container_t *container, msg_t *msg)
     // get profile context out of the container
     profile_t *profile = (profile_t *)container->profile_context;
 
-    // update profile data
+    // auto-update profile data
     Profile_Handler(container, msg, profile);
 
     // call the profile callback if needed

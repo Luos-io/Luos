@@ -10,14 +10,10 @@
  ******************************************************************************/
 void Luos_LinkProfile(profile_t *profile, profile_state_t *profile_state, CONT_CB callback)
 {
-    int i = 0;
-
     profile->type              = STATE_TYPE;
     profile->cmd               = IO_STATE;
+    profile->access            = READ_WRITE_ACCESS;
     profile->profile_data.size = sizeof(profile_state_t);
     profile->profile_data.data = (uint8_t *)profile_state;
-    if (callback != 0)
-    {
-        profile->profile_callback = callback;
-    }
+    profile->profile_callback  = callback;
 }
