@@ -18,7 +18,7 @@
 typedef struct
 {
     uint32_t size;
-    uint8_t *data;
+    void *data; // general pointer to handle all type of data structures
 } profile_data_t;
 
 typedef struct
