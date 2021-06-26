@@ -56,8 +56,7 @@ static void Profile_MsgHandler(container_t *container, msg_t *msg)
 
 /******************************************************************************
  * @brief Container creation following the template
- * @param cont_cb is an optional user callback called on every massage for this container
- * @param state_struct template object pointer
+ * @param profile_core_t the profile handler to launch
  * @param alias for the container string (15 caracters max).
  * @param revision FW for the container (tab[MajorVersion,MinorVersion,Patch])
  * @return None
