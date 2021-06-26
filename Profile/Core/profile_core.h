@@ -28,7 +28,7 @@ typedef struct
     access_t access;
     profile_data_t profile_data;
     CONT_CB profile_callback;
-} profile_t;
+} profile_core_t;
 
 /*******************************************************************************
  * Variables
@@ -37,6 +37,6 @@ typedef struct
 /*******************************************************************************
  * Function
  ******************************************************************************/
-container_t *Luos_LaunchProfile(profile_t *profile, const char *alias, revision_t revision);
+container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revision_t revision);
 
 #endif /* PROFILE_CORE_H_ */

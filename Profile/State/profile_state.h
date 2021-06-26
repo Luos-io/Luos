@@ -25,6 +25,6 @@ typedef struct
 /*******************************************************************************
  * Function
  ******************************************************************************/
-void Luos_LinkProfile(profile_t *profile, profile_state_t *profile_state, CONT_CB callback);
+void Luos_LinkProfile(profile_core_t *profile, profile_state_t *profile_state, CONT_CB callback);
 
 #endif /* PROFILE_STATE_H_ */

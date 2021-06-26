@@ -7,7 +7,7 @@
  * @param state_struct the data struct to update
  * @return None
  ******************************************************************************/
-void Profile_Handler(container_t *container, msg_t *msg, profile_t *profile)
+void Profile_Handler(container_t *container, msg_t *msg, profile_core_t *profile)
 {
     // if someone sends us general ASK_PUB_CMD then publish data
     if ((msg->header.cmd == ASK_PUB_CMD) && ((profile->access == READ_WRITE_ACCESS) || (profile->access == READ_ONLY_ACCESS)))
@@ -42,7 +42,7 @@ void Profile_Handler(container_t *container, msg_t *msg, profile_t *profile)
 static void Profile_MsgHandler(container_t *container, msg_t *msg)
 {
     // get profile context out of the container
-    profile_t *profile = (profile_t *)container->profile_context;
+    profile_core_t *profile = (profile_core_t *)container->profile_context;
 
     // auto-update profile data
     Profile_Handler(container, msg, profile);
@@ -62,7 +62,7 @@ static void Profile_MsgHandler(container_t *container, msg_t *msg)
  * @param revision FW for the container (tab[MajorVersion,MinorVersion,Patch])
  * @return None
  ******************************************************************************/
-container_t *Luos_LaunchProfile(profile_t *profile, const char *alias, revision_t revision)
+container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revision_t revision)
 {
     container_t *container     = Luos_CreateContainer(Profile_MsgHandler, profile->type, alias, revision);
     container->profile_context = (void *)profile;
