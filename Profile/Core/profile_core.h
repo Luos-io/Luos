@@ -41,7 +41,11 @@ typedef struct
 // start a service which has been already linked with a profile
 container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revision_t revision);
 
-// send message to the specified service
+// send message to the specified container
 void Luos_SendProfile(char *dest, char *src, luos_cmd_t cmd, const void *data, uint32_t size);
+
+// GET / SET access of a speficied container
+void Luos_SetAccessProfile(profile_core_t *profile, access_t access);
+access_t Luos_GetAccessProfile(profile_core_t *profile);
 
 #endif /* PROFILE_CORE_H_ */

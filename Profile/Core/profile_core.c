@@ -94,3 +94,24 @@ void Luos_SendProfile(char *dest, char *src, luos_cmd_t cmd, const void *data, u
     memcpy(msg.data, data, size);
     Luos_SendMsg(container_src, &msg);
 }
+
+/******************************************************************************
+ * @brief set access of the specified container
+ * @param profile handler
+ * @param access to set in the profile handler
+ * @return None
+ ******************************************************************************/
+void Luos_SetAccessProfile(profile_core_t *profile, access_t access)
+{
+    profile->access = access;
+}
+
+/******************************************************************************
+ * @brief get access of the specified container
+ * @param profile handler
+ * @return access of the profile handler
+ ******************************************************************************/
+access_t Luos_GetAccessProfile(profile_core_t *profile)
+{
+    return profile->access;
+}
