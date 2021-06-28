@@ -928,3 +928,23 @@ void Luos_Flush(void)
 {
     Robus_Flush();
 }
+
+/******************************************************************************
+ * @brief  Return a container from its alias
+ * @param pointer to alias
+ * @return container or error
+ ******************************************************************************/
+container_t *Luos_GetContainerFromAlias(char *alias)
+{
+    if (*alias != -1)
+    {
+        for (int i = 0; i <= MAX_CONTAINER_NUMBER; i++)
+        {
+            if (strcmp((const char *)container_table[i].alias, alias) == 0)
+            {
+                return &container_table[i];
+            }
+        }
+    }
+    return 0;
+}

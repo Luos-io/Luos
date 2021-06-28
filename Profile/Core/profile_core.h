@@ -42,6 +42,6 @@ typedef struct
 container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revision_t revision);
 
 // send message to the specified service
-void Luos_SendProfile(const char *dest, container_t *src, luos_cmd_t cmd, const void *data, uint32_t size);
+void Luos_SendProfile(char *dest, char *src, luos_cmd_t cmd, const void *data, uint32_t size);
 
 #endif /* PROFILE_CORE_H_ */
