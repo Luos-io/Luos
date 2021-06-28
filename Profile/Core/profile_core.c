@@ -67,3 +67,25 @@ container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revi
     container->profile_context = (void *)profile;
     return container;
 }
+
+/******************************************************************************
+ * @brief find the profile type from alias
+ * @param profile_core_t the profile handler to launch
+ * @param alias for the container string (15 caracters max).
+ * @param revision FW for the container (tab[MajorVersion,MinorVersion,Patch])
+ * @return None
+ ******************************************************************************/
+void Luos_SendProfile(const char *dest, container_t *src, luos_cmd_t cmd, const void *data, uint32_t size)
+{
+    // get the container id of the destination from the routing table
+    uint8_t id_dest = RoutingTB_IDFromAlias(dest);
+
+    // send the message from the source to the dest
+    msg_t msg;
+    msg.header.target      = id_dest;
+    msg.header.cmd         = cmd;
+    msg.header.target_mode = IDACK;
+    msg.header.size        = size;
+    memcpy(msg.data, data, size);
+    Luos_SendMsg(src, &msg);
+}
