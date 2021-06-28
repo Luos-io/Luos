@@ -565,7 +565,7 @@ void RoutingTB_RemoveNode(uint16_t nodeid)
                 // We find our node remove all containers
                 while (routing_table[i].mode == CONTAINER)
                 {
-                    RoutingTB_RemoveOnRoutingTable(i);
+                    RoutingTB_RemoveOnRoutingTable(RoutingTB_GetContainerID(i));
                 }
                 return;
             }
@@ -574,15 +574,23 @@ void RoutingTB_RemoveNode(uint16_t nodeid)
 }
 /******************************************************************************
  * @brief remove an entry from routing_table
- * @param index of container
+ * @param id of container
  * @return None
  ******************************************************************************/
-void RoutingTB_RemoveOnRoutingTable(uint16_t index)
+void RoutingTB_RemoveOnRoutingTable(uint16_t id)
 {
-    LUOS_ASSERT(index < last_routing_table_entry);
-    memcpy(&routing_table[index], &routing_table[index + 1], sizeof(routing_table_t) * (last_routing_table_entry - (index + 1)));
-    last_routing_table_entry--;
-    memset(&routing_table[last_routing_table_entry], 0, sizeof(routing_table_t));
+    // find the container
+    for (uint16_t i = 0; i < last_routing_table_entry; i++)
+    {
+        if ((routing_table[i].mode == CONTAINER) && (routing_table[i].id == id))
+        {
+            LUOS_ASSERT(i < last_routing_table_entry);
+            memcpy(&routing_table[i], &routing_table[i + 1], sizeof(routing_table_t) * (last_routing_table_entry - (i + 1)));
+            last_routing_table_entry--;
+            memset(&routing_table[last_routing_table_entry], 0, sizeof(routing_table_t));
+            return;
+        }
+    }
 }
 /******************************************************************************
  * @brief eras erouting_table
