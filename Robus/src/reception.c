@@ -30,8 +30,11 @@ uint16_t data_size  = 0;
 uint16_t crc_val    = 0;
 
 #ifdef SNIFFER_H
-uint64_t error_count     = 0;
-uint64_t collision_count = 0;
+uint64_t timestamp[MAX_MSG_NB] = {0};
+uint8_t w_pos                  = 0;
+uint8_t r_pos                  = 0;
+uint64_t crc_error_count       = 0;
+uint64_t corruption_count      = 0;
 #endif /* SNIFFER_H */
 
 /*******************************************************************************
@@ -59,7 +62,9 @@ void Recep_GetHeader(volatile uint8_t *data)
     // Catch a byte.
     MsgAlloc_SetData(*data);
     data_count++;
-
+#ifdef SNIFFER_H
+    timestamp[w_pos] = (uint64_t)LuosHAL_GetSystick();
+#endif
     // Check if we have all we need.
     switch (data_count)
     {
@@ -109,13 +114,16 @@ void Recep_GetHeader(volatile uint8_t *data)
                 if (data_size)
                 {
                     MsgAlloc_ValidHeader(true, data_size);
+#ifdef SNIFFER_H
+                    w_pos = (w_pos < MAX_MSG_NB - 1) ? w_pos + 1 : 0;
+#endif /* SNIFFER_H */
                 }
             }
             else
             {
                 MsgAlloc_ValidHeader(false, data_size);
 #ifdef SNIFFER_H
-                error_count++;
+                corruption_count++;
 #endif /* SNIFFER_H */
                 ctx.rx.callback = Recep_Drop;
                 return;
@@ -176,7 +184,7 @@ void Recep_GetData(volatile uint8_t *data)
                 Transmit_SendAck();
             }
 #else
-            error_count++;
+            crc_error_count++;
 #endif /* SNIFFER_H */
             MsgAlloc_InvalidMsg();
         }
@@ -197,9 +205,6 @@ void Recep_GetCollision(volatile uint8_t *data)
     {
         // Data dont match, or we don't start to send the message, there is a collision
         ctx.tx.collision = true;
-#ifdef SNIFFER_H
-        collision_count++;
-#endif /* SNIFFER_H */
         // Stop TX trying to save input datas
         LuosHAL_SetTxState(false);
         // Save the received data into the allocator to be able to continue the reception
@@ -419,7 +424,6 @@ void Recep_InterpretMsgProtocol(msg_t *msg)
     // Find if we are concerned by this message.
 
 #ifdef SNIFFER_H    //always allocate msg for the sniffer_container
-                
     MsgAlloc_LuosTaskAlloc((ll_container_t *)&ctx.ll_container_table[0], msg);
     return;
 #endif /*  SNIFFER_H */
@@ -490,17 +494,28 @@ void Recep_InterpretMsgProtocol(msg_t *msg)
  * @param None
  * @return global counter
  ******************************************************************************/
-uint64_t Recep_GetErrorNum(void)
+uint64_t Recep_GetCrcErrorNum(void)
 {
-    return error_count;
+    return crc_error_count;
 }
 /******************************************************************************
- * @brief return the number of collisions
+ * @brief return the number of crc and bad header errors
  * @param None
  * @return global counter
  ******************************************************************************/
-uint64_t Recep_GetCollisionNum(void)
+uint64_t Recep_GetCorruptionNum(void)
 {
-    return collision_count;
+    return corruption_count;
+}
+/******************************************************************************
+ * @brief return the time of msg reception
+ * @param None
+ * @return global counter
+ ******************************************************************************/
+uint64_t Recep_GetSystick(void)
+{
+    uint64_t tt = timestamp[r_pos];
+    r_pos = (r_pos < MAX_MSG_NB - 1) ? (r_pos + 1) : 0;
+    return tt;
 }
 #endif /* SNIFFER_H */
