@@ -62,13 +62,13 @@ void Recep_GetHeader(volatile uint8_t *data)
     // Catch a byte.
     MsgAlloc_SetData(*data);
     data_count++;
-#ifdef SNIFFER_H
-    timestamp[w_pos] = (uint64_t)LuosHAL_GetSystick();
-#endif
     // Check if we have all we need.
     switch (data_count)
     {
         case 1: //reset CRC computation
+#ifdef SNIFFER_H
+            timestamp[w_pos] = (uint64_t)LuosHAL_GetSystick() * 1000000;
+#endif /* SNIFFER_H */
             ctx.tx.lock = true;
             // Switch the transmit status to disable to be sure to not interpreat the end timeout as an end of transmission.
             ctx.tx.status = TX_DISABLE;
@@ -114,9 +114,6 @@ void Recep_GetHeader(volatile uint8_t *data)
                 if (data_size)
                 {
                     MsgAlloc_ValidHeader(true, data_size);
-#ifdef SNIFFER_H
-                    w_pos = (w_pos < MAX_MSG_NB - 1) ? w_pos + 1 : 0;
-#endif /* SNIFFER_H */
                 }
             }
             else
@@ -173,6 +170,7 @@ void Recep_GetData(volatile uint8_t *data)
             }
 #else   //in case of a sniffer we dont send an ACK
             MsgAlloc_EndMsg();
+            w_pos = (w_pos < MAX_MSG_NB - 1) ? w_pos + 1 : 0;
 #endif /* SNIFFER_H */
         }
         else
