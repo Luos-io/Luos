@@ -99,7 +99,7 @@ void Robus_Loop(void)
     msg_t *msg = NULL;
     while (MsgAlloc_PullMsgToInterpret(&msg) == SUCCEED)
     {
-        // Check if this message is a protocole one
+        // Check if this message is a protocol one
         if (Robus_MsgHandler(msg) == FAILED)
         {
             // If not create luos tasks.
@@ -170,7 +170,7 @@ error_return_t Robus_SendMsg(ll_container_t *ll_container, msg_t *msg)
         data_size = msg->header.size;
     }
     // Add the CRC to the total size of the message
-    uint16_t full_size = sizeof(header_t) + data_size + 2;
+    uint16_t full_size = sizeof(header_t) + data_size + CRC_SIZE;
 
     // compute the CRC
     for (uint16_t i = 0; i < full_size - 2; i++)

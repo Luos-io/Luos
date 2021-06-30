@@ -81,26 +81,26 @@ memory_stats_t *mem_stat = NULL;
 // msg buffering
 volatile uint8_t msg_buffer[MSG_BUFFER_SIZE]; /*!< Memory space used to save and alloc messages. */
 volatile msg_t *current_msg;                  /*!< current work in progress msg pointer. */
-volatile uint8_t *data_ptr;                   /*!< Pointer to the next data able to be writen into msgbuffer. */
+volatile uint8_t *data_ptr;                   /*!< Pointer to the next data able to be written into msgbuffer. */
 volatile uint8_t *data_end_estimation;        /*!< Estimated end of the current receiving message. */
 volatile msg_t *oldest_msg = NULL;            /*!< The oldest message among all the stacks. */
 volatile msg_t *used_msg   = NULL;            /*!< Message curently used by luos loop. */
-volatile uint8_t mem_clear_needed;            /*!< A flag allowing to spot some msg space cleaning opérations to do. */
+volatile uint8_t mem_clear_needed;            /*!< A flag allowing to spot some msg space cleaning operations to do. */
 
 // Allocator task stack
 volatile header_t *copy_task_pointer = NULL; /*!< This pointer is used to perform a header copy from the end of the msg_buffer to the begin of the msg_buffer. If this pointer if different than NULL there is a copy to make. */
 
 // msg interpretation task stack
 volatile msg_t *msg_tasks[MAX_MSG_NB]; /*!< ready message table. */
-volatile uint16_t msg_tasks_stack_id;  /*!< last writen msg_tasks id. */
+volatile uint16_t msg_tasks_stack_id;  /*!< Next writen msg_tasks id. */
 
 // Luos task stack
 volatile luos_task_t luos_tasks[MAX_MSG_NB]; /*!< Message allocation table. */
-volatile uint16_t luos_tasks_stack_id;       /*!< last writen luos_tasks id. */
+volatile uint16_t luos_tasks_stack_id;       /*!< Next writen luos_tasks id. */
 
 // Tx task stack
 volatile tx_task_t tx_tasks[MAX_MSG_NB]; /*!< Message to transmit allocation table. */
-volatile uint16_t tx_tasks_stack_id;     /*!< last writen tx_tasks id. */
+volatile uint16_t tx_tasks_stack_id;     /*!< Next writen tx_tasks id. */
 
 /*******************************************************************************
  * Functions
@@ -147,7 +147,7 @@ void MsgAlloc_Init(memory_stats_t *memory_stats)
     //******** Init global vars pointers **********
     current_msg         = (msg_t *)&msg_buffer[0];
     data_ptr            = (uint8_t *)&msg_buffer[0];
-    data_end_estimation = (uint8_t *)&current_msg->data[2];
+    data_end_estimation = (uint8_t *)&current_msg->data[CRC_SIZE];
     msg_tasks_stack_id  = 0;
     memset((void *)msg_tasks, 0, sizeof(msg_tasks));
     luos_tasks_stack_id = 0;
@@ -268,26 +268,34 @@ static inline void MsgAlloc_OldestMsgCandidate(msg_t *oldest_stack_msg_pt)
         if ((uint32_t)oldest_stack_msg_pt > (uint32_t)current_msg)
         {
             // The oldest task is between `data_end_estimation` and the end of the buffer
+            LuosHAL_SetIrqState(false);
             stack_delta_space = (uint32_t)oldest_stack_msg_pt - (uint32_t)current_msg;
+            LuosHAL_SetIrqState(true);
         }
         else
         {
             // The oldest task is between the begin of the buffer and `data_end_estimation`
             // we have to decay it to be able to define delta
+            LuosHAL_SetIrqState(false);
             stack_delta_space = ((uint32_t)oldest_stack_msg_pt - (uint32_t)&msg_buffer[0]) + ((uint32_t)&msg_buffer[MSG_BUFFER_SIZE] - (uint32_t)current_msg);
+            LuosHAL_SetIrqState(true);
         }
         // recompute oldest_msg into delta byte from current message
         uint32_t oldest_msg_delta_space;
         if ((uint32_t)oldest_msg > (uint32_t)current_msg)
         {
             // The oldest msg is between `data_end_estimation` and the end of the buffer
+            LuosHAL_SetIrqState(false);
             oldest_msg_delta_space = (uint32_t)oldest_msg - (uint32_t)current_msg;
+            LuosHAL_SetIrqState(true);
         }
         else
         {
             // The oldest msg is between the begin of the buffer and `data_end_estimation`
             // we have to decay it to be able to define delta
+            LuosHAL_SetIrqState(false);
             oldest_msg_delta_space = ((uint32_t)oldest_msg - (uint32_t)&msg_buffer[0]) + ((uint32_t)&msg_buffer[MSG_BUFFER_SIZE] - (uint32_t)current_msg);
+            LuosHAL_SetIrqState(true);
         }
         // Compare deltas
         if (stack_delta_space < oldest_msg_delta_space)
@@ -349,7 +357,7 @@ void MsgAlloc_InvalidMsg(void)
         MsgAlloc_ClearMsgSpace((void *)current_msg, (void *)(data_ptr));
     }
     data_ptr            = (uint8_t *)current_msg;
-    data_end_estimation = (uint8_t *)(&current_msg->stream[sizeof(header_t) + 2]);
+    data_end_estimation = (uint8_t *)(&current_msg->stream[sizeof(header_t) + CRC_SIZE]);
     LUOS_ASSERT((uint32_t)data_end_estimation < (uint32_t)&msg_buffer[MSG_BUFFER_SIZE]);
     if (current_msg == (volatile msg_t *)&msg_buffer[0])
     {
@@ -368,7 +376,7 @@ void MsgAlloc_ValidHeader(uint8_t valid, uint16_t data_size)
     // Save the concerned module pointer into the concerned module pointer stack
     if (valid == true)
     {
-        if (MsgAlloc_DoWeHaveSpace((void *)(&current_msg->data[data_size + 2])) == FAILED)
+        if (MsgAlloc_DoWeHaveSpace((void *)(&current_msg->data[data_size + CRC_SIZE])) == FAILED)
         {
             // We are at the end of msg_buffer, we need to move the current space to the begin of msg_buffer
             // Create a task to copy the header at the begining of msg_buffer
@@ -379,9 +387,9 @@ void MsgAlloc_ValidHeader(uint8_t valid, uint16_t data_size)
             data_ptr = &msg_buffer[sizeof(header_t)];
         }
         // Save the end position of our message
-        data_end_estimation = (uint8_t *)&current_msg->data[data_size + 2];
+        data_end_estimation = (uint8_t *)&current_msg->data[data_size + CRC_SIZE];
         // check if there is a msg treatment pending
-        if (((uint32_t)used_msg >= (uint32_t)current_msg) && ((uint32_t)used_msg <= (uint32_t)(&current_msg->data[data_size + 2])))
+        if (((uint32_t)used_msg >= (uint32_t)current_msg) && ((uint32_t)used_msg <= (uint32_t)(&current_msg->data[data_size + CRC_SIZE])))
         {
             used_msg = NULL;
             // This message is in the space we want to use, clear the task
@@ -435,21 +443,21 @@ void MsgAlloc_EndMsg(void)
     msg_tasks_stack_id++;
     //******** Prepare the next msg *********
     //data_ptr is actually 2 bytes after the message data because of the CRC. Remove the CRC.
-    data_ptr -= 2;
+    data_ptr -= CRC_SIZE;
     // Check data ptr alignement
     if (*data_ptr % 2 != 1)
     {
         data_ptr++;
     }
     // Check if we have space for the next message
-    if (MsgAlloc_DoWeHaveSpace((void *)(data_ptr + sizeof(header_t) + 2)) == FAILED)
+    if (MsgAlloc_DoWeHaveSpace((void *)(data_ptr + sizeof(header_t) + CRC_SIZE)) == FAILED)
     {
         data_ptr = &msg_buffer[0];
     }
     // update the current_msg
     current_msg = (volatile msg_t *)data_ptr;
     // Save the estimated end of the next message
-    data_end_estimation = (uint8_t *)&current_msg->data[2];
+    data_end_estimation = (uint8_t *)&current_msg->data[CRC_SIZE];
     // Raise the clear flag allowing to perform a clear
     mem_clear_needed = true;
 }
@@ -588,11 +596,10 @@ static inline void MsgAlloc_ClearMsgTask(void)
         LuosHAL_SetIrqState(false);
         msg_tasks[rm] = msg_tasks[rm + 1];
     }
-    if (msg_tasks_stack_id != 0)
-    {
-        msg_tasks_stack_id--;
-        msg_tasks[msg_tasks_stack_id] = 0;
-    }
+
+    msg_tasks_stack_id--;
+    msg_tasks[msg_tasks_stack_id] = 0;
+
     LuosHAL_SetIrqState(true);
     MsgAlloc_FindNewOldestMsg();
 }
@@ -634,7 +641,7 @@ void MsgAlloc_UsedMsgEnd(void)
  ******************************************************************************/
 static inline void MsgAlloc_ClearLuosTask(uint16_t luos_task_id)
 {
-    LUOS_ASSERT((luos_task_id <= luos_tasks_stack_id) || (luos_tasks_stack_id <= MAX_MSG_NB));
+    LUOS_ASSERT((luos_task_id < luos_tasks_stack_id) && (luos_tasks_stack_id <= MAX_MSG_NB));
     for (uint16_t rm = luos_task_id; rm < luos_tasks_stack_id; rm++)
     {
         LuosHAL_SetIrqState(false);
@@ -672,6 +679,7 @@ void MsgAlloc_LuosTaskAlloc(ll_container_t *container_concerned_by_current_msg, 
     }
     // fill the informations of the message in this slot
     LuosHAL_SetIrqState(false);
+    LUOS_ASSERT(luos_tasks_stack_id < MAX_MSG_NB);
     luos_tasks[luos_tasks_stack_id].msg_pt          = concerned_msg;
     luos_tasks[luos_tasks_stack_id].ll_container_pt = container_concerned_by_current_msg;
     if (luos_tasks_stack_id == 0)
@@ -1013,7 +1021,7 @@ void MsgAlloc_PullMsgFromTxTask(void)
  ******************************************************************************/
 void MsgAlloc_PullContainerFromTxTask(uint16_t container_id)
 {
-    LUOS_ASSERT((tx_tasks_stack_id > 0) && (tx_tasks_stack_id < MAX_MSG_NB));
+    LUOS_ASSERT((tx_tasks_stack_id > 0) && (tx_tasks_stack_id <= MAX_MSG_NB));
     uint8_t task_id = 0;
     // check all task
     while (task_id < tx_tasks_stack_id)
@@ -1052,7 +1060,7 @@ void MsgAlloc_PullContainerFromTxTask(uint16_t container_id)
  * @param localhost is this message a localhost one
  * @return error_return_t : Fail is there is no more message available.
  ******************************************************************************/
-error_return_t MsgAlloc_GetTxTask(ll_container_t **ll_container_pt, uint8_t **data, uint16_t *size, uint8_t *locahost)
+error_return_t MsgAlloc_GetTxTask(ll_container_t **ll_container_pt, uint8_t **data, uint16_t *size, uint8_t *localhost)
 {
     LUOS_ASSERT(tx_tasks_stack_id < MAX_MSG_NB);
     MsgAlloc_ValidDataIntegrity();
@@ -1061,7 +1069,7 @@ error_return_t MsgAlloc_GetTxTask(ll_container_t **ll_container_pt, uint8_t **da
         *data            = tx_tasks[0].data_pt;
         *size            = tx_tasks[0].size;
         *ll_container_pt = tx_tasks[0].ll_container_pt;
-        *locahost        = tx_tasks[0].localhost;
+        *localhost       = tx_tasks[0].localhost;
         return SUCCEED;
     }
     return FAILED;

@@ -75,7 +75,7 @@ void Luos_Loop(void)
         // check if this is a Luos Command
         uint8_t cmd   = 0;
         uint16_t size = 0;
-        // There is a possibility to receive in IT a restet_detection so check task before doing any treatement
+        // There is a possibility to receive in IT a reset_detection so check task before doing any treatement
         if ((MsgAlloc_GetLuosTaskCmd(remaining_msg_number, &cmd) != SUCCEED) || (MsgAlloc_GetLuosTaskSize(remaining_msg_number, &size) != SUCCEED))
         {
             break;

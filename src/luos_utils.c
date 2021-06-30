@@ -13,6 +13,13 @@
 #include "stdbool.h"
 
 /*******************************************************************************
+ * Variables
+ ******************************************************************************/
+#ifdef UNIT_TEST
+ut_luos_assert_t ut_assert = {.state = 0, .enable = 1};
+#endif
+
+/*******************************************************************************
  * Function
  ******************************************************************************/
 
@@ -58,3 +65,33 @@ void Luos_assert(char *file, uint32_t line)
     {
     }
 }
+
+#ifdef UNIT_TEST
+/******************************************************************************
+ * @brief Luos assertion management for unit testing
+ * @param file name as a string
+ * @param line number
+ * @return None
+ ******************************************************************************/
+void Luos_unittest_assert(char *file, uint32_t line)
+{
+    // completely reinit the allocator
+    MsgAlloc_Init(NULL);
+    msg_t msg;
+
+    ut_assert.state     = 1;
+    ut_assert.line_size = sizeof(line);
+    ut_assert.file_size = strlen(file);
+
+    msg.header.target_mode = BROADCAST;
+    msg.header.target      = BROADCAST_VAL;
+    msg.header.cmd         = ASSERT;
+    msg.header.size        = sizeof(line) + strlen(file);
+    memcpy(msg.data, &line, sizeof(line));
+    memcpy(&msg.data[sizeof(line)], file, strlen(file));
+
+    ut_assert.msg = msg;
+
+    LuosHAL_SetIrqState(false);
+}
+#endif

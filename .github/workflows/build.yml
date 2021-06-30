@@ -92,3 +92,12 @@ jobs:
         # STM32F4-discovery
         platformio run -d Projects/STM32F4-discovery/Button
         platformio run -d Projects/STM32F4-discovery/Gate
+
+    - name: Run PlatformIO Unit Tests
+      env:
+        PLATFORMIO_LIB_EXTRA_DIRS: ${{ matrix.pio_lib_path }}
+      if: ${{ runner.os == 'Windows' }}
+      run: |
+        cd ../Luos/
+        platformio run -t clean        
+        platformio test -e native --verbose
