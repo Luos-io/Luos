@@ -18,10 +18,10 @@ void Luos_StateInit(void)
 void Luos_StateHandler(container_t *container, msg_t *msg)
 {
     // get profile context out of the container
-    profile_core_t *profile = (profile_core_t *)container->profile_context;
+    profile_core_t *profile = Luos_GetProfileFromContainer(container);
 
     // get profiles_cmd structures from profile handler
-    profile_cmd_t *state_cmd = &profile->profile_cmd[0];
+    profile_cmd_t *state_cmd = Luos_GetCmdFromProfile(profile, 0);
     state_data_t *state_data = (state_data_t *)state_cmd->cmd_handler;
 
     // if someone sends us general ASK_PUB_CMD then publish data
@@ -68,14 +68,12 @@ void Luos_AddCommandToProfile(profile_cmd_t *profile_cmd, state_data_t *state_da
  ******************************************************************************/
 void Luos_LinkStateProfile(profile_core_t *profile, profile_cmd_t *profile_cmd, CONT_CB callback)
 {
-    // set general profile handler type
-    profile->type = STATE_TYPE;
+    // create profile_ops structure and fill it with functions
+    profile_ops_t state_ops = {
+        .Init     = Luos_StateInit,
+        .Handler  = Luos_StateHandler,
+        .Callback = callback};
 
-    // set profile handler / callback functions
-    profile->profile_ops.Init     = Luos_StateInit;
-    profile->profile_ops.Handler  = Luos_StateHandler;
-    profile->profile_ops.Callback = callback;
-
-    // link general profile handler to the command array
-    profile->profile_cmd = profile_cmd;
+    // initialize profile handler with state profile data
+    Luos_LinkProfile(profile, STATE_TYPE, profile_cmd, &state_ops);
 }

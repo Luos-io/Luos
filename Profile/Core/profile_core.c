@@ -1,6 +1,45 @@
 #include "profile_core.h"
 
 /******************************************************************************
+ * @brief get command from profile
+ * @param profile pointer 
+ * @return profile_cmd pointer
+ ******************************************************************************/
+profile_cmd_t *Luos_GetCmdFromProfile(profile_core_t *profile, uint8_t cmd_number)
+{
+    return &profile->profile_cmd[cmd_number];
+}
+
+/******************************************************************************
+ * @brief get profile_context from container
+ * @param Container 
+ * @return profile_context pointer
+ ******************************************************************************/
+profile_core_t *Luos_GetProfileFromContainer(container_t *container)
+{
+    return (profile_core_t *)container->profile_context;
+}
+
+/******************************************************************************
+ * @brief get profile_context from container
+ * @param Container 
+ * @return profile_context pointer
+ ******************************************************************************/
+void Luos_LinkProfile(profile_core_t *profile, luos_type_t type, profile_cmd_t *profile_cmd, profile_ops_t *profile_ops)
+{
+    // set general profile handler type
+    profile->type = type;
+
+    // set profile handler / callback functions
+    profile->profile_ops.Init     = profile_ops->Init;
+    profile->profile_ops.Handler  = profile_ops->Handler;
+    profile->profile_ops.Callback = profile_ops->Callback;
+
+    // link general profile handler to the command array
+    profile->profile_cmd = profile_cmd;
+}
+
+/******************************************************************************
  * @brief Msg Handler call backed by Luos when a msg receive for this container
  * @param Container destination
  * @param Msg receive
@@ -9,7 +48,7 @@
 static void Luos_ProfileHandler(container_t *container, msg_t *msg)
 {
     // get profile context out of the container
-    profile_core_t *profile = (profile_core_t *)container->profile_context;
+    profile_core_t *profile = Luos_GetProfileFromContainer(container);
 
     // auto-update profile data
     profile->profile_ops.Handler(container, msg);
