@@ -21,30 +21,30 @@ void Luos_StateHandler(container_t *container, msg_t *msg)
     profile_core_t *profile = (profile_core_t *)container->profile_context;
 
     // get profiles_cmd structures from profile handler
-    profile_cmd_t *profile_state = &profile->profile_cmd[0];
-    state_data_t *state_data     = (state_data_t *)profile_state->cmd_handler;
+    profile_cmd_t *state_cmd = &profile->profile_cmd[0];
+    state_data_t *state_data = (state_data_t *)state_cmd->cmd_handler;
 
     // if someone sends us general ASK_PUB_CMD then publish data
     if ((msg->header.cmd == ASK_PUB_CMD) && ((state_data->access == READ_WRITE_ACCESS) || (state_data->access == READ_ONLY_ACCESS)))
     {
         // fill the message infos
         msg_t pub_msg;
-        pub_msg.header.cmd         = profile_state->cmd;
+        pub_msg.header.cmd         = state_cmd->cmd;
         pub_msg.header.target_mode = msg->header.target_mode;
         pub_msg.header.target      = msg->header.source;
 
         // fill with profile data
-        pub_msg.header.size = profile_state->cmd_size;
-        memcpy(&pub_msg.data, state_data, profile_state->cmd_size);
+        pub_msg.header.size = state_cmd->cmd_size;
+        memcpy(&pub_msg.data, state_data, state_cmd->cmd_size);
 
         // send message
         Luos_SendMsg(container, &pub_msg);
     }
     // if someone sends us state command, copy to the profile data
-    if ((msg->header.cmd == profile_state->cmd) && ((state_data->access == READ_WRITE_ACCESS) || (state_data->access == WRITE_ONLY_ACCESS)))
+    if ((msg->header.cmd == state_cmd->cmd) && ((state_data->access == READ_WRITE_ACCESS) || (state_data->access == WRITE_ONLY_ACCESS)))
     {
         // save received data in profile data
-        memcpy(state_data, &msg->data, profile_state->cmd_size);
+        memcpy(state_data, &msg->data, state_cmd->cmd_size);
     }
 }
 
