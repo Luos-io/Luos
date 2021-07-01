@@ -25,7 +25,7 @@ typedef struct
 {
     uint8_t access;
     bool value;
-} state_cmd_t;
+} state_data_t;
 
 /*******************************************************************************
  * Variables
@@ -34,7 +34,7 @@ typedef struct
 /*******************************************************************************
  * Function
  ******************************************************************************/
-void Luos_AddCommandToProfile(profile_cmd_t cmd_array[NB_CMD], state_cmd_t *state_cmd);
-void Luos_LinkStateProfile(profile_core_t *profile, profile_cmd_t cmd_array[NB_CMD], CONT_CB callback);
+void Luos_AddCommandToProfile(profile_cmd_t *profile_cmd, state_data_t *state_data);
+void Luos_LinkStateProfile(profile_core_t *profile, profile_cmd_t *profile_cmd, CONT_CB callback);
 
 #endif /* PROFILE_STATE_H_ */

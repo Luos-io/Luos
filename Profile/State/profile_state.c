@@ -22,10 +22,10 @@ void Luos_StateHandler(container_t *container, msg_t *msg)
 
     // get profiles_cmd structures from profile handler
     profile_cmd_t *profile_state = &profile->profile_cmd[0];
-    state_cmd_t *state_cmd       = (state_cmd_t *)profile_state->cmd_handler;
+    state_data_t *state_data     = (state_data_t *)profile_state->cmd_handler;
 
     // if someone sends us general ASK_PUB_CMD then publish data
-    if ((msg->header.cmd == ASK_PUB_CMD) && ((state_cmd->access == READ_WRITE_ACCESS) || (state_cmd->access == READ_ONLY_ACCESS)))
+    if ((msg->header.cmd == ASK_PUB_CMD) && ((state_data->access == READ_WRITE_ACCESS) || (state_data->access == READ_ONLY_ACCESS)))
     {
         // fill the message infos
         msg_t pub_msg;
@@ -35,16 +35,16 @@ void Luos_StateHandler(container_t *container, msg_t *msg)
 
         // fill with profile data
         pub_msg.header.size = profile_state->cmd_size;
-        memcpy(&pub_msg.data, profile_state->cmd_handler, profile_state->cmd_size);
+        memcpy(&pub_msg.data, state_data, profile_state->cmd_size);
 
         // send message
         Luos_SendMsg(container, &pub_msg);
     }
     // if someone sends us state command, copy to the profile data
-    if ((msg->header.cmd == profile_state->cmd) && ((state_cmd->access == READ_WRITE_ACCESS) || (state_cmd->access == WRITE_ONLY_ACCESS)))
+    if ((msg->header.cmd == profile_state->cmd) && ((state_data->access == READ_WRITE_ACCESS) || (state_data->access == WRITE_ONLY_ACCESS)))
     {
         // save received data in profile data
-        memcpy(profile_state->cmd_handler, &msg->data, profile_state->cmd_size);
+        memcpy(state_data, &msg->data, profile_state->cmd_size);
     }
 }
 
@@ -54,9 +54,9 @@ void Luos_StateHandler(container_t *container, msg_t *msg)
  * @param state_cmd structure used by state profile 
  * @return None
  ******************************************************************************/
-void Luos_AddCommandToProfile(profile_cmd_t cmd[NB_CMD], state_cmd_t *state_cmd)
+void Luos_AddCommandToProfile(profile_cmd_t *profile_cmd, state_data_t *state_data)
 {
-    ADD_CMD(cmd[0], IO_STATE, sizeof(state_cmd_t), (void *)state_cmd);
+    ADD_CMD(profile_cmd[0], IO_STATE, sizeof(state_data_t), (void *)state_data);
 }
 
 /******************************************************************************
@@ -66,7 +66,7 @@ void Luos_AddCommandToProfile(profile_cmd_t cmd[NB_CMD], state_cmd_t *state_cmd)
  * @param callback used by the profile
  * @return None
  ******************************************************************************/
-void Luos_LinkStateProfile(profile_core_t *profile, profile_cmd_t cmd[NB_CMD], CONT_CB callback)
+void Luos_LinkStateProfile(profile_core_t *profile, profile_cmd_t *profile_cmd, CONT_CB callback)
 {
     // set general profile handler type
     profile->type = STATE_TYPE;
@@ -77,5 +77,5 @@ void Luos_LinkStateProfile(profile_core_t *profile, profile_cmd_t cmd[NB_CMD], C
     profile->profile_ops.Callback = callback;
 
     // link general profile handler to the command array
-    profile->profile_cmd = cmd;
+    profile->profile_cmd = profile_cmd;
 }
