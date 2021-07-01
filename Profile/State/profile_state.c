@@ -8,14 +8,11 @@
  ******************************************************************************/
 void Luos_StateHandler(container_t *container, msg_t *msg)
 {
-    // get profile context out of the container
     profile_core_t *profile = Luos_GetProfileFromContainer(container);
 
-    // get profiles_cmd structures from profile handler
     profile_cmd_t *state_cmd = Luos_GetCmdFromProfile(profile, 0);
     state_data_t *state_data = (state_data_t *)state_cmd->cmd_handler;
 
-    // if someone sends us general ASK_PUB_CMD then publish data
     if ((msg->header.cmd == ASK_PUB_CMD) && ((state_data->access == READ_WRITE_ACCESS) || (state_data->access == READ_ONLY_ACCESS)))
     {
         // fill the message infos
@@ -23,18 +20,12 @@ void Luos_StateHandler(container_t *container, msg_t *msg)
         pub_msg.header.cmd         = state_cmd->cmd;
         pub_msg.header.target_mode = msg->header.target_mode;
         pub_msg.header.target      = msg->header.source;
-
-        // fill with profile data
-        pub_msg.header.size = state_cmd->cmd_size;
+        pub_msg.header.size        = state_cmd->cmd_size;
         memcpy(&pub_msg.data, state_data, state_cmd->cmd_size);
-
-        // send message
         Luos_SendMsg(container, &pub_msg);
     }
-    // if someone sends us state command, copy to the profile data
     if ((msg->header.cmd == state_cmd->cmd) && ((state_data->access == READ_WRITE_ACCESS) || (state_data->access == WRITE_ONLY_ACCESS)))
     {
-        // save received data in profile data
         memcpy(state_data, &msg->data, state_cmd->cmd_size);
     }
 }
@@ -59,12 +50,10 @@ void Luos_AddCommandToProfile(profile_cmd_t *profile_cmd, state_data_t *state_da
  ******************************************************************************/
 void Luos_LinkStateProfile(profile_core_t *profile, profile_cmd_t *profile_cmd, CONT_CB callback)
 {
-    // create profile_ops structure and fill it with functions
     profile_ops_t state_ops = {
         .Init     = 0,
         .Handler  = Luos_StateHandler,
         .Callback = callback};
 
-    // initialize profile handler with state profile data
     Luos_LinkProfile(profile, STATE_TYPE, profile_cmd, &state_ops);
 }
