@@ -6,7 +6,7 @@
  * @param Msg receive
  * @return None
  ******************************************************************************/
-static void Profile_MsgHandler(container_t *container, msg_t *msg)
+static void Luos_ProfileHandler(container_t *container, msg_t *msg)
 {
     // get profile context out of the container
     profile_core_t *profile = (profile_core_t *)container->profile_context;
@@ -31,7 +31,7 @@ static void Profile_MsgHandler(container_t *container, msg_t *msg)
 container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revision_t revision)
 {
     // create container
-    container_t *container = Luos_CreateContainer(Profile_MsgHandler, profile->type, alias, revision);
+    container_t *container = Luos_CreateContainer(Luos_ProfileHandler, profile->type, alias, revision);
 
     // link profile to container
     container->profile_context = (void *)profile;
