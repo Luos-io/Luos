@@ -51,7 +51,7 @@ void Luos_StateHandler(container_t *container, msg_t *msg)
 /******************************************************************************
  * @brief Lik state profile to the general profile handler
  * @param cmd array used by the profile, 
- * @param state_cmd structure used by state profile 
+ * @param state_data structure used by state profile 
  * @return None
  ******************************************************************************/
 void Luos_AddCommandToProfile(profile_cmd_t *profile_cmd, state_data_t *state_data)
