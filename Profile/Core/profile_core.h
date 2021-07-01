@@ -48,7 +48,7 @@ typedef struct
 /*******************************************************************************
  * Function
  ******************************************************************************/
-profile_cmd_t *Luos_GetCmdFromProfile(profile_core_t *profile, uint8_t cmd_number);
+profile_cmd_t *Luos_GetCmdFromProfile(profile_core_t *profile, const luos_cmd_t luos_cmd);
 profile_core_t *Luos_GetProfileFromContainer(container_t *container);
 void Luos_LinkProfile(profile_core_t *profile, luos_type_t type, profile_cmd_t *profile_cmd, profile_ops_t *profile_ops);
 container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revision_t revision);

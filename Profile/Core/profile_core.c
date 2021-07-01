@@ -5,9 +5,14 @@
  * @param profile pointer 
  * @return profile_cmd pointer
  ******************************************************************************/
-profile_cmd_t *Luos_GetCmdFromProfile(profile_core_t *profile, uint8_t cmd_number)
+profile_cmd_t *Luos_GetCmdFromProfile(profile_core_t *profile, const luos_cmd_t luos_cmd)
 {
-    return &profile->profile_cmd[cmd_number];
+    uint8_t cmd_index = 0;
+    while (profile->profile_cmd[cmd_index].cmd != luos_cmd)
+    {
+        cmd_index += 1;
+    }
+    return &profile->profile_cmd[cmd_index];
 }
 
 /******************************************************************************

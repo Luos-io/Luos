@@ -10,7 +10,7 @@ void Luos_StateHandler(container_t *container, msg_t *msg)
 {
     profile_core_t *profile = Luos_GetProfileFromContainer(container);
 
-    profile_cmd_t *state_cmd = Luos_GetCmdFromProfile(profile, 0);
+    profile_cmd_t *state_cmd = Luos_GetCmdFromProfile(profile, IO_STATE);
     state_data_t *state_data = (state_data_t *)state_cmd->cmd_handler;
 
     if ((msg->header.cmd == ASK_PUB_CMD) && ((state_data->access == READ_WRITE_ACCESS) || (state_data->access == READ_ONLY_ACCESS)))
