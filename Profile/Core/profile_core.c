@@ -50,13 +50,12 @@ void Luos_LinkProfile(profile_core_t *profile, luos_type_t type, profile_cmd_t *
  ******************************************************************************/
 static void Luos_ProfileHandler(container_t *container, msg_t *msg)
 {
-    // get profile context out of the container
     profile_core_t *profile = Luos_GetProfileFromContainer(container);
 
     // auto-update profile data
     profile->profile_ops.Handler(container, msg);
 
-    // call the profile callback if needed
+    // call the profile callback when the container receive a message
     if (profile->profile_ops.Callback != 0)
     {
         profile->profile_ops.Callback(container, msg);
@@ -72,13 +71,10 @@ static void Luos_ProfileHandler(container_t *container, msg_t *msg)
  ******************************************************************************/
 container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revision_t revision)
 {
-    // create container
-    container_t *container = Luos_CreateContainer(Luos_ProfileHandler, profile->type, alias, revision);
-
-    // link profile to container
+    container_t *container     = Luos_CreateContainer(Luos_ProfileHandler, profile->type, alias, revision);
     container->profile_context = (void *)profile;
 
-    // call the profile init if needed
+    // call the profile init function at container startup
     if (profile->profile_ops.Init != 0)
     {
         profile->profile_ops.Init();
@@ -98,13 +94,10 @@ container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revi
  ******************************************************************************/
 void Luos_SendProfile(char *dest, char *src, luos_cmd_t cmd, const void *data, uint32_t size)
 {
-    // find container_t pointer from alias
     container_t *container_src = Luos_GetContainerFromAlias(src);
 
-    // get the container id of the destination from the routing table
     uint8_t id_dest = RoutingTB_IDFromAlias(dest);
 
-    // send the message from the source to the dest
     msg_t msg;
     msg.header.target      = id_dest;
     msg.header.cmd         = cmd;
