@@ -1,15 +1,6 @@
 #include "profile_state.h"
 
 /******************************************************************************
- * @brief Profile Initialisation function
- * @param None
- * @return None
- ******************************************************************************/
-void Luos_StateInit(void)
-{
-}
-
-/******************************************************************************
  * @brief function converting Luos messages into data and reverse.
  * @param container the target container
  * @param msg the received message
@@ -70,7 +61,7 @@ void Luos_LinkStateProfile(profile_core_t *profile, profile_cmd_t *profile_cmd, 
 {
     // create profile_ops structure and fill it with functions
     profile_ops_t state_ops = {
-        .Init     = Luos_StateInit,
+        .Init     = 0,
         .Handler  = Luos_StateHandler,
         .Callback = callback};
 
