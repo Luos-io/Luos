@@ -15,6 +15,11 @@
  ******************************************************************************/
 #define NB_CMD 1
 
+#define CREATE_STATE_PROFILE(state_profile, cmd, state_cmd, name, rev) \
+    Luos_AddCommandToProfile(cmd, &state_cmd);                         \
+    Luos_LinkStateProfile(&state_profile, cmd, 0);                     \
+    Luos_LaunchProfile(&state_profile, name, rev);
+
 // state profile data
 typedef struct
 {
