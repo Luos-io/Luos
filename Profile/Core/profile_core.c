@@ -21,9 +21,12 @@ profile_core_t *Luos_GetProfileFromContainer(container_t *container)
 }
 
 /******************************************************************************
- * @brief get profile_context from container
- * @param Container 
- * @return profile_context pointer
+ * @brief Initialize profile handler
+ * @param profile handler 
+ * @param type of the profile
+ * @param profile_cmd for the profile
+ * @param profile_ops for the profile
+ * @return none
  ******************************************************************************/
 void Luos_LinkProfile(profile_core_t *profile, luos_type_t type, profile_cmd_t *profile_cmd, profile_ops_t *profile_ops)
 {
