@@ -13,10 +13,14 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+#define NB_CMD 1
+
+// state profile data
 typedef struct
 {
-    bool state;
-} profile_state_t;
+    uint8_t access;
+    bool value;
+} state_cmd_t;
 
 /*******************************************************************************
  * Variables
@@ -25,6 +29,7 @@ typedef struct
 /*******************************************************************************
  * Function
  ******************************************************************************/
-void Luos_LinkProfile(profile_core_t *profile, profile_state_t *profile_state, CONT_CB callback);
+void Luos_AddCommandToProfile(profile_cmd_t cmd_array[NB_CMD], state_cmd_t *state_cmd);
+void Luos_LinkStateProfile(profile_core_t *profile, profile_cmd_t cmd_array[NB_CMD], CONT_CB callback);
 
 #endif /* PROFILE_STATE_H_ */

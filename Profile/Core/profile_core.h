@@ -15,19 +15,30 @@
  * Definitions
  ******************************************************************************/
 
+#define ADD_CMD(profile_cmd, cmd_type, size, handler) \
+    profile_cmd.cmd         = cmd_type;               \
+    profile_cmd.cmd_size    = size;                   \
+    profile_cmd.cmd_handler = handler;
+
 typedef struct
 {
-    uint32_t size;
-    void *data; // general pointer to handle all type of data structures
-} profile_data_t;
+    luos_cmd_t cmd;
+    uint32_t cmd_size;
+    void *cmd_handler; // general pointer to handle all type of data structures
+} profile_cmd_t;
+
+typedef struct
+{
+    void (*Init)(void);
+    void (*Handler)(container_t *, msg_t *);
+    CONT_CB Callback;
+} profile_ops_t;
 
 typedef struct
 {
     luos_type_t type;
-    luos_cmd_t cmd;
-    access_t access;
-    profile_data_t profile_data;
-    CONT_CB profile_callback;
+    profile_cmd_t *profile_cmd;
+    profile_ops_t profile_ops;
 } profile_core_t;
 
 /*******************************************************************************
