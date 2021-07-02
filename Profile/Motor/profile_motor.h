@@ -54,4 +54,13 @@ typedef struct
     current_t current;
 } profile_motor_t;
 
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
+
+/*******************************************************************************
+ * Function
+ ******************************************************************************/
+void Luos_LinkMotorProfile(profile_core_t *profile, profile_motor_t *profile_motor, CONT_CB callback);
+
 #endif /* TEMPLATE_STRUCT_MOTOR_H_ */

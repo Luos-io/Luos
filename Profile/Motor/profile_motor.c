@@ -1,4 +1,5 @@
 #include "profile_motor.h"
+#include "math.h"
 
 /******************************************************************************
  * @brief function converting Luos messages into data and reverse.
@@ -80,7 +81,7 @@ void Luos_MotorHandler(container_t *container, msg_t *msg)
  * @param callback used by the profile
  * @return None
  ******************************************************************************/
-void Luos_LinkProfile(profile_core_t *profile, profile_motor_t *profile_motor, CONT_CB callback)
+void Luos_LinkMotorProfile(profile_core_t *profile, profile_motor_t *profile_motor, CONT_CB callback)
 {
     // set general profile handler type
     profile->type = MOTOR_TYPE;

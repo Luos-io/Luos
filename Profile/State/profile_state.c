@@ -35,7 +35,7 @@ void Luos_StateHandler(container_t *container, msg_t *msg)
  * @param callback used by the profile
  * @return None
  ******************************************************************************/
-void Luos_LinkProfile(profile_core_t *profile, profile_state_t *profile_state, CONT_CB callback)
+void Luos_LinkStateProfile(profile_core_t *profile, profile_state_t *profile_state, CONT_CB callback)
 {
     // set general profile handler type
     profile->type = STATE_TYPE;
