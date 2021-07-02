@@ -58,5 +58,6 @@ uint16_t Luos_NbrAvailableMsg(void);
 uint32_t Luos_GetSystick(void);
 error_return_t Luos_TxComplete(void);
 void Luos_Flush(void);
+void Luos_AddPackage(package_t *package);
 
 #endif /* LUOS_H */

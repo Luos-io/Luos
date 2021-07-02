@@ -70,6 +70,15 @@ typedef struct __attribute__((__packed__)) timed_update_t
     uint16_t target;
 } timed_update_t;
 
+/* This structure is used to manage packages
+ * please refer to the documentation
+ */
+typedef struct
+{
+    void (*Init)(void);
+    void (*Loop)(void);
+} package_t;
+
 /* This structure is used to manage containers
  * please refer to the documentation
  */
