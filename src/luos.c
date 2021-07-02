@@ -39,6 +39,18 @@ static error_return_t Luos_SaveAlias(container_t *container, uint8_t *alias);
 static void Luos_WriteAlias(uint16_t local_id, uint8_t *alias);
 static error_return_t Luos_ReadAlias(uint16_t local_id, uint8_t *alias);
 static error_return_t Luos_IsALuosCmd(container_t *container, uint8_t cmd, uint16_t size);
+static void Luos_EmptyNode(void);
+
+/******************************************************************************
+ * @brief Create a service to signal empty node
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_EmptyNode(void)
+{
+    revision_t revision = {.unmap = {1, 0, 0}};
+    Luos_CreateContainer(0, LUOS_LAST_TYPE, "empty_node", revision);
+}
 
 /******************************************************************************
  * @brief Luos init must be call in project init
@@ -52,10 +64,17 @@ void Luos_Init(void)
     Robus_Init(&luos_stats.memory);
 
     uint16_t package_index = 0;
-    while (package_index < package_number)
+    if (package_number)
     {
-        package_table[package_index].Init();
-        package_index += 1;
+        while (package_index < package_number)
+        {
+            package_table[package_index].Init();
+            package_index += 1;
+        }
+    }
+    else
+    {
+        Luos_EmptyNode();
     }
 }
 /******************************************************************************
