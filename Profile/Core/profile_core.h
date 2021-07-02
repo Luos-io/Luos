@@ -16,7 +16,7 @@
  ******************************************************************************/
 typedef struct
 {
-    void (*Init)(void *);
+    void (*Init)(HANDLER *);
     void (*Handler)(container_t *, msg_t *);
     CONT_CB Callback;
 } profile_ops_t;
@@ -24,7 +24,7 @@ typedef struct
 typedef struct
 {
     luos_type_t type;
-    void *profile_data;
+    HANDLER *profile_data;
     profile_ops_t profile_ops;
 } profile_core_t;
 

@@ -66,7 +66,7 @@ void Luos_LinkVoltageProfile(profile_core_t *profile, profile_voltage_t *profile
     profile->type = VOLTAGE_TYPE;
 
     // link general profile handler to the profile data structure
-    profile->profile_data = (void *)profile_voltage;
+    profile->profile_data = (HANDLER *)profile_voltage;
 
     // set profile handler / callback functions
     profile->profile_ops.Init     = 0;

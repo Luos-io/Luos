@@ -42,11 +42,11 @@ container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revi
     // call the profile init function if needed
     if (profile->profile_ops.Init != 0)
     {
-        profile->profile_ops.Init((void *)profile);
+        profile->profile_ops.Init((HANDLER *)profile);
     }
 
     container_t *container     = Luos_CreateContainer(Luos_ProfileHandler, profile->type, alias, revision);
-    container->profile_context = (void *)profile;
+    container->profile_context = (HANDLER *)profile;
 
     return container;
 }

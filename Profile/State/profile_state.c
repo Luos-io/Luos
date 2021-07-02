@@ -41,7 +41,7 @@ void Luos_LinkStateProfile(profile_core_t *profile, profile_state_t *profile_sta
     profile->type = STATE_TYPE;
 
     // link general profile handler to the profile data structure
-    profile->profile_data = (void *)profile_state;
+    profile->profile_data = (HANDLER *)profile_state;
 
     // set profile handler / callback functions
     profile->profile_ops.Init     = 0;

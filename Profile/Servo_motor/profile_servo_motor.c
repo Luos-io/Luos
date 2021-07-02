@@ -7,7 +7,7 @@
  * @param msg the received message
  * @return None
  ******************************************************************************/
-void Luos_ServoMotorInit(void *handler)
+void Luos_ServoMotorInit(HANDLER *handler)
 {
     profile_core_t *profile                    = (profile_core_t *)handler;
     profile_servo_motor_t *servo_motor_profile = (profile_servo_motor_t *)profile->profile_data;
@@ -266,7 +266,7 @@ void Luos_LinkServoMotorProfile(profile_core_t *profile, profile_servo_motor_t *
     profile->type = SERVO_MOTOR_TYPE;
 
     // link general profile handler to the profile data structure
-    profile->profile_data = (void *)profile_servo_motor;
+    profile->profile_data = (HANDLER *)profile_servo_motor;
 
     // set profile handler / callback functions
     profile->profile_ops.Init     = Luos_ServoMotorInit;

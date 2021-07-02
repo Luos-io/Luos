@@ -87,7 +87,7 @@ void Luos_LinkMotorProfile(profile_core_t *profile, profile_motor_t *profile_mot
     profile->type = MOTOR_TYPE;
 
     // link general profile handler to the profile data structure
-    profile->profile_data = (void *)profile_motor;
+    profile->profile_data = (HANDLER *)profile_motor;
 
     // set profile handler / callback functions
     profile->profile_ops.Init     = 0;
