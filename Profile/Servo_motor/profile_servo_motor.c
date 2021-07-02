@@ -2,6 +2,13 @@
 #include "luos_hal.h"
 
 /******************************************************************************
+ * @brief Initilization function
+ * @param container the target container
+ * @param msg the received message
+ * @return None
+ ******************************************************************************/
+
+/******************************************************************************
  * @brief function converting Luos messages into data and reverse.
  * @param container the target container
  * @param msg the received message
@@ -210,6 +217,23 @@ void Luos_ServoMotorHandler(container_t *container, msg_t *msg)
         {
             // save time in ms
             TimeOD_TimeFromMsg((time_luos_t *)&servo_motor_profile->sampling_period, msg);
+        }
+        break;
+        case PARAMETERS:
+        {
+            // fill the message infos
+            memcpy((void *)&servo_motor_profile->mode, msg->data, sizeof(servo_motor_mode_t));
+
+            // copy motor specific configuration into motor object
+            servo_motor_profile->motor.mode.current        = servo_motor_profile->mode.current;
+            servo_motor_profile->motor.mode.mode_compliant = servo_motor_profile->mode.mode_compliant;
+            servo_motor_profile->motor.mode.temperature    = servo_motor_profile->mode.temperature;
+
+            // manage specific configuration operations
+            if (servo_motor_profile->mode.mode_compliant == 0)
+            {
+                servo_motor_profile->target_angular_position = servo_motor_profile->angular_position;
+            }
         }
         break;
     }
