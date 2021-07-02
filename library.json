@@ -13,13 +13,15 @@
             "-I Robus/inc",
             "-I OD",
             "-I Profile/Core",
-            "-I Profile/State"
+            "-I Profile/State",
+            "-I Profile/Motor"
         ],
         "srcFilter": [
             "+<*.c>",
             "+<../Robus/src/*.c>",
             "+<../Profile/Core/*.c>",
-            "+<../Profile/State/*.c>"
+            "+<../Profile/State/*.c>",
+            "+<../Profile/Motor/*.c>"
         ]
     },
     "dependencies": [
