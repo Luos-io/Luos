@@ -13,19 +13,13 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define NB_CMD 1
-
-#define CREATE_STATE_PROFILE(state_profile, cmd, state_cmd, name, rev) \
-    Luos_AddCommandToProfile(cmd, &state_cmd);                         \
-    Luos_LinkStateProfile(&state_profile, cmd, 0);                     \
-    Luos_LaunchProfile(&state_profile, name, rev);
 
 // state profile data
 typedef struct
 {
     uint8_t access;
-    bool value;
-} state_data_t;
+    bool state;
+} profile_state_t;
 
 /*******************************************************************************
  * Variables
@@ -34,7 +28,6 @@ typedef struct
 /*******************************************************************************
  * Function
  ******************************************************************************/
-void Luos_AddCommandToProfile(profile_cmd_t *profile_cmd, state_data_t *state_data);
-void Luos_LinkStateProfile(profile_core_t *profile, profile_cmd_t *profile_cmd, CONT_CB callback);
+void Luos_LinkProfile(profile_core_t *profile, profile_state_t *profile_state, CONT_CB callback);
 
 #endif /* PROFILE_STATE_H_ */

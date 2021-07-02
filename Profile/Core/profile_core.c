@@ -1,21 +1,6 @@
 #include "profile_core.h"
 
 /******************************************************************************
- * @brief get command from profile
- * @param profile pointer 
- * @return profile_cmd pointer
- ******************************************************************************/
-profile_cmd_t *Luos_GetCmdFromProfile(profile_core_t *profile, const luos_cmd_t luos_cmd)
-{
-    uint8_t cmd_index = 0;
-    while (profile->profile_cmd[cmd_index].cmd != luos_cmd)
-    {
-        cmd_index += 1;
-    }
-    return &profile->profile_cmd[cmd_index];
-}
-
-/******************************************************************************
  * @brief get profile_context from container
  * @param Container 
  * @return profile_context pointer
@@ -23,28 +8,6 @@ profile_cmd_t *Luos_GetCmdFromProfile(profile_core_t *profile, const luos_cmd_t 
 profile_core_t *Luos_GetProfileFromContainer(container_t *container)
 {
     return (profile_core_t *)container->profile_context;
-}
-
-/******************************************************************************
- * @brief Initialize profile handler
- * @param profile handler 
- * @param type of the profile
- * @param profile_cmd for the profile
- * @param profile_ops for the profile
- * @return none
- ******************************************************************************/
-void Luos_LinkProfile(profile_core_t *profile, luos_type_t type, profile_cmd_t *profile_cmd, profile_ops_t *profile_ops)
-{
-    // set general profile handler type
-    profile->type = type;
-
-    // set profile handler / callback functions
-    profile->profile_ops.Init     = profile_ops->Init;
-    profile->profile_ops.Handler  = profile_ops->Handler;
-    profile->profile_ops.Callback = profile_ops->Callback;
-
-    // link general profile handler to the command array
-    profile->profile_cmd = profile_cmd;
 }
 
 /******************************************************************************

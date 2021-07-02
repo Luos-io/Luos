@@ -14,19 +14,6 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-
-#define ADD_CMD(profile_cmd, cmd_type, size, handler) \
-    profile_cmd.cmd         = cmd_type;               \
-    profile_cmd.cmd_size    = size;                   \
-    profile_cmd.cmd_handler = handler;
-
-typedef struct
-{
-    luos_cmd_t cmd;
-    uint32_t cmd_size;
-    void *cmd_handler; // general pointer to handle all type of data structures
-} profile_cmd_t;
-
 typedef struct
 {
     void (*Init)(void);
@@ -37,7 +24,7 @@ typedef struct
 typedef struct
 {
     luos_type_t type;
-    profile_cmd_t *profile_cmd;
+    void *profile_data;
     profile_ops_t profile_ops;
 } profile_core_t;
 
@@ -48,9 +35,7 @@ typedef struct
 /*******************************************************************************
  * Function
  ******************************************************************************/
-profile_cmd_t *Luos_GetCmdFromProfile(profile_core_t *profile, const luos_cmd_t luos_cmd);
 profile_core_t *Luos_GetProfileFromContainer(container_t *container);
-void Luos_LinkProfile(profile_core_t *profile, luos_type_t type, profile_cmd_t *profile_cmd, profile_ops_t *profile_ops);
 container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revision_t revision);
 void Luos_SendProfile(char *dest, char *src, luos_cmd_t cmd, const void *data, uint32_t size);
 
