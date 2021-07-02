@@ -75,9 +75,9 @@ void Luos_MotorHandler(container_t *container, msg_t *msg)
 }
 
 /******************************************************************************
- * @brief Lik state profile to the general profile handler
+ * @brief Link motor profile to the general profile handler
  * @param profile handler, 
- * @param profile_state handler, 
+ * @param profile_motor handler, 
  * @param callback used by the profile
  * @return None
  ******************************************************************************/
