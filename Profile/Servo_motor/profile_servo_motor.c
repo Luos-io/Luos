@@ -7,6 +7,15 @@
  * @param msg the received message
  * @return None
  ******************************************************************************/
+void Luos_ServoMotorInit(void *handler)
+{
+    profile_core_t *profile                    = (profile_core_t *)handler;
+    profile_servo_motor_t *servo_motor_profile = (profile_servo_motor_t *)profile->profile_data;
+
+    servo_motor_profile->motor.mode.current        = servo_motor_profile->mode.current;
+    servo_motor_profile->motor.mode.mode_compliant = servo_motor_profile->mode.mode_compliant;
+    servo_motor_profile->motor.mode.temperature    = servo_motor_profile->mode.temperature;
+}
 
 /******************************************************************************
  * @brief function converting Luos messages into data and reverse.
@@ -260,7 +269,7 @@ void Luos_LinkServoMotorProfile(profile_core_t *profile, profile_servo_motor_t *
     profile->profile_data = (void *)profile_servo_motor;
 
     // set profile handler / callback functions
-    profile->profile_ops.Init     = 0;
+    profile->profile_ops.Init     = Luos_ServoMotorInit;
     profile->profile_ops.Handler  = Luos_ServoMotorHandler;
     profile->profile_ops.Callback = callback;
 }
