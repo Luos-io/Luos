@@ -61,6 +61,7 @@ typedef struct
 /*******************************************************************************
  * Function
  ******************************************************************************/
+void Luos_MotorHandler(container_t *container, msg_t *msg);
 void Luos_LinkMotorProfile(profile_core_t *profile, profile_motor_t *profile_motor, CONT_CB callback);
 
 #endif /* TEMPLATE_STRUCT_MOTOR_H_ */
