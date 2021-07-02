@@ -14,14 +14,16 @@
             "-I OD",
             "-I Profile/Core",
             "-I Profile/State",
-            "-I Profile/Motor"
+            "-I Profile/Motor",
+            "-I Profile/Voltage"
         ],
         "srcFilter": [
             "+<*.c>",
             "+<../Robus/src/*.c>",
             "+<../Profile/Core/*.c>",
             "+<../Profile/State/*.c>",
-            "+<../Profile/Motor/*.c>"
+            "+<../Profile/Motor/*.c>",
+            "+<../Profile/Voltage/*.c>"
         ]
     },
     "dependencies": [
