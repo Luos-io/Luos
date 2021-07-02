@@ -15,7 +15,8 @@
             "-I Profile/Core",
             "-I Profile/State",
             "-I Profile/Motor",
-            "-I Profile/Voltage"
+            "-I Profile/Voltage",
+            "-I Profile/Servo_motor"
         ],
         "srcFilter": [
             "+<*.c>",
@@ -23,7 +24,8 @@
             "+<../Profile/Core/*.c>",
             "+<../Profile/State/*.c>",
             "+<../Profile/Motor/*.c>",
-            "+<../Profile/Voltage/*.c>"
+            "+<../Profile/Voltage/*.c>",
+            "+<../Profile/Servo_motor/*.c>"
         ]
     },
     "dependencies": [
