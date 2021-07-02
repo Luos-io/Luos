@@ -16,7 +16,7 @@
  ******************************************************************************/
 typedef struct
 {
-    void (*Init)(void);
+    void (*Init)(void *);
     void (*Handler)(container_t *, msg_t *);
     CONT_CB Callback;
 } profile_ops_t;

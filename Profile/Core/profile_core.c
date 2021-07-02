@@ -39,14 +39,14 @@ static void Luos_ProfileHandler(container_t *container, msg_t *msg)
  ******************************************************************************/
 container_t *Luos_LaunchProfile(profile_core_t *profile, const char *alias, revision_t revision)
 {
-    container_t *container     = Luos_CreateContainer(Luos_ProfileHandler, profile->type, alias, revision);
-    container->profile_context = (void *)profile;
-
-    // call the profile init function at container startup
+    // call the profile init function if needed
     if (profile->profile_ops.Init != 0)
     {
-        profile->profile_ops.Init();
+        profile->profile_ops.Init((void *)profile);
     }
+
+    container_t *container     = Luos_CreateContainer(Luos_ProfileHandler, profile->type, alias, revision);
+    container->profile_context = (void *)profile;
 
     return container;
 }
