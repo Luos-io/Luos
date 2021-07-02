@@ -31,7 +31,7 @@ void Luos_StateHandler(container_t *container, msg_t *msg)
 /******************************************************************************
  * @brief Lik state profile to the general profile handler
  * @param profile handler, 
- * @param cmd array used by the profile, 
+ * @param profile_state handler, 
  * @param callback used by the profile
  * @return None
  ******************************************************************************/
