@@ -18,11 +18,11 @@
  * Definitions
  ******************************************************************************/
 // Initialise package with a macro
-#define LUOS_ADD_PACKAGE(_name)      \
-    package_t _##_name##_package = { \
-        .Init = _##_name##_Init,     \
-        .Loop = _##_name##_Loop};    \
-    Luos_AddPackage(&_##_name##_package);
+#define LUOS_ADD_PACKAGE(_name)   \
+    package_t _name##_package = { \
+        .Init = _name##_Init,     \
+        .Loop = _name##_Loop};    \
+    Luos_AddPackage(&_name##_package);
 
 /******************************************************************************
  * @struct general_stats_t
