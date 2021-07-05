@@ -39,7 +39,7 @@ void selftest_init(void)
 result_t selftest_com(void)
 {
     msg_t msg;
-    msg.header.target      = 0;
+    msg.header.target      = 2;
     msg.header.target_mode = NODEIDACK;
     msg.header.cmd         = IO_STATE;
     msg.header.size        = 5 * sizeof(uint8_t);
@@ -71,7 +71,7 @@ result_t selftest_ptp(void)
  ******************************************************************************/
 void selftest_run(void)
 {
-    selftest_init();
+    //selftest_init();
 
     selftest_com();
     selftest_ptp();
