@@ -39,18 +39,7 @@ static error_return_t Luos_SaveAlias(container_t *container, uint8_t *alias);
 static void Luos_WriteAlias(uint16_t local_id, uint8_t *alias);
 static error_return_t Luos_ReadAlias(uint16_t local_id, uint8_t *alias);
 static error_return_t Luos_IsALuosCmd(container_t *container, uint8_t cmd, uint16_t size);
-static void Luos_EmptyNode(void);
-
-/******************************************************************************
- * @brief Create a service to signal empty node
- * @param None
- * @return None
- ******************************************************************************/
-void Luos_EmptyNode(void)
-{
-    revision_t revision = {.unmap = {1, 0, 0}};
-    Luos_CreateContainer(0, LUOS_LAST_TYPE, "empty_node", revision);
-}
+static inline void Luos_EmptyNode(void);
 
 /******************************************************************************
  * @brief Luos init must be call in project init
@@ -971,4 +960,15 @@ void Luos_AddPackage(void (*Init)(void), void (*Loop)(void))
     package_table[package_number].Loop = Loop;
 
     package_number += 1;
+}
+
+/******************************************************************************
+ * @brief Create a service to signal empty node
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_EmptyNode(void)
+{
+    revision_t revision = {.unmap = {1, 0, 0}};
+    Luos_CreateContainer(0, LUOS_LAST_TYPE, "empty_node", revision);
 }
