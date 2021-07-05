@@ -17,7 +17,7 @@ typedef enum
     OK = 1
 } result_t;
 
-static inline result_t selftest_init(void);
+static inline void selftest_init(void);
 static inline result_t selftest_com(void);
 static inline result_t selftest_ptp(void);
 
@@ -26,7 +26,7 @@ static inline result_t selftest_ptp(void);
  * @param None
  * @return None
  ******************************************************************************/
-result_t selftest_init(void)
+void selftest_init(void)
 {
     Luos_Init();
 }
@@ -48,7 +48,9 @@ result_t selftest_com(void)
     msg.data[2]            = 0xAA;
     msg.data[3]            = 0x55;
     msg.data[4]            = 0xAA;
-    Luos_SendMsg(0, msg);
+    Luos_SendMsg(0, &msg);
+
+    return OK;
 }
 
 /******************************************************************************
@@ -58,6 +60,8 @@ result_t selftest_com(void)
  ******************************************************************************/
 result_t selftest_ptp(void)
 {
+
+    return OK;
 }
 
 /******************************************************************************

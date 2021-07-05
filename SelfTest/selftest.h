@@ -9,4 +9,6 @@
 
 #include "luos.h"
 
+void selftest_run(void);
+
 #endif /* LUOS_H */
