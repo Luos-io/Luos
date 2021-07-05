@@ -965,10 +965,10 @@ void Luos_Flush(void)
  * @param package to register
  * @return None
  ******************************************************************************/
-void Luos_AddPackage(package_t *package)
+void Luos_AddPackage(void (*Init)(void), void (*Loop)(void))
 {
-    package_table[package_number].Init = package->Init;
-    package_table[package_number].Loop = package->Loop;
+    package_table[package_number].Init = Init;
+    package_table[package_number].Loop = Loop;
 
     package_number += 1;
 }
