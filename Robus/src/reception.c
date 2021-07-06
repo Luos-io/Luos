@@ -21,6 +21,10 @@
 #include <stdio.h>
 #endif
 
+#ifdef SELFTEST
+#include "selftest.h"
+#endif
+
 #define COLLISION_DETECTION_NUMBER 4
 /*******************************************************************************
  * Variables
@@ -206,6 +210,9 @@ void Recep_GetCollision(volatile uint8_t *data)
     {
         if (data_count == COLLISION_DETECTION_NUMBER)
         {
+#ifdef SELFTEST
+            selftest_SetRxFlag();
+#endif
             // collision detection end
             LuosHAL_SetRxState(false);
             LuosHAL_ResetTimeout(0);

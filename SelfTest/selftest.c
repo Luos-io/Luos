@@ -6,6 +6,7 @@
  ******************************************************************************/
 
 #include "selftest.h"
+#include "luos_hal.h"
 
 /*******************************************************************************
  * Definitions
@@ -17,9 +18,32 @@ typedef enum
     OK = 1
 } result_t;
 
+volatile uint8_t rx_flag  = 0;
+volatile uint8_t ptp_flag = 0;
+
 static inline void selftest_init(void);
 static inline result_t selftest_com(void);
 static inline result_t selftest_ptp(void);
+
+/******************************************************************************
+ * @brief set ptp selftest flag
+ * @param None
+ * @return None
+ ******************************************************************************/
+void selftest_SetPtpFlag(void)
+{
+    ptp_flag = 1;
+}
+
+/******************************************************************************
+ * @brief set rx selftest flag
+ * @param None
+ * @return None
+ ******************************************************************************/
+void selftest_SetRxFlag(void)
+{
+    rx_flag = 1;
+}
 
 /******************************************************************************
  * @brief Initialization of the luos library
@@ -38,9 +62,8 @@ void selftest_init(void)
  ******************************************************************************/
 result_t selftest_com(void)
 {
-    uint8_t flag = 0;
     msg_t msg;
-    msg.header.target      = 0;
+    msg.header.target      = 1;
     msg.header.target_mode = NODEID;
     msg.header.cmd         = IO_STATE;
     msg.header.size        = 5 * sizeof(uint8_t);
@@ -50,13 +73,14 @@ result_t selftest_com(void)
     msg.data[3]            = 0x55;
     msg.data[4]            = 0xAA;
 
-    while (1)
+    Luos_SendMsg(0, &msg);
+
+    uint32_t tickstart = LuosHAL_GetSystick();
+    while (!rx_flag)
     {
-        Luos_Loop();
-        if (!flag)
+        if ((LuosHAL_GetSystick() - tickstart) > 3000)
         {
-            Luos_SendMsg(0, &msg);
-            flag = 1;
+            return KO;
         }
     }
 
@@ -70,6 +94,18 @@ result_t selftest_com(void)
  ******************************************************************************/
 result_t selftest_ptp(void)
 {
+    LuosHAL_SetPTPDefaultState(0);
+    if (LuosHAL_GetPTPState(1))
+        return KO;
+
+    LuosHAL_PushPTP(0);
+    if (!LuosHAL_GetPTPState(1))
+        return KO;
+
+    if (!ptp_flag)
+    {
+        return KO;
+    }
 
     return OK;
 }
@@ -81,8 +117,17 @@ result_t selftest_ptp(void)
  ******************************************************************************/
 void selftest_run(void)
 {
+    result_t result = OK;
+
     selftest_init();
 
-    selftest_com();
-    selftest_ptp();
+    if (result == OK)
+    {
+        result = selftest_com();
+    }
+
+    if (result == OK)
+    {
+        result = selftest_ptp();
+    }
 }

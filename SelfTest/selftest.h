@@ -9,6 +9,8 @@
 
 #include "luos.h"
 
+void selftest_SetPtpFlag(void);
+void selftest_SetRxFlag(void);
 void selftest_run(void);
 
 #endif /* LUOS_H */
