@@ -115,7 +115,7 @@ result_t selftest_ptp(void)
  * @param None
  * @return None
  ******************************************************************************/
-void selftest_run(void)
+void selftest_run(void (*ok_callback)(void), void (*ko_callback)(void))
 {
     result_t result = OK;
 
@@ -129,5 +129,17 @@ void selftest_run(void)
     if (result == OK)
     {
         result = selftest_ptp();
+    }
+
+    switch (result)
+    {
+        case OK:
+            ok_callback();
+            break;
+        case KO:
+            ko_callback();
+            break;
+        default:
+            ko_callback();
     }
 }
