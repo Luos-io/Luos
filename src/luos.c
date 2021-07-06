@@ -19,8 +19,7 @@
  * Variables
  ******************************************************************************/
 revision_t luos_version = {.Major = 1, .Minor = 2, .Build = 0};
-package_t package_table[MAX_CONTAINER_NUMBER];
-uint16_t package_number;
+uint16_t package_number = 0;
 container_t container_table[MAX_CONTAINER_NUMBER];
 uint16_t container_number;
 volatile routing_table_t *routing_table_pt;
@@ -57,7 +56,7 @@ void Luos_Init(void)
     {
         while (package_index < package_number)
         {
-            package_table[package_index].Init();
+            container_table[package_index].package_ops.Init();
             package_index += 1;
         }
     }
@@ -147,7 +146,7 @@ void Luos_Loop(void)
     uint16_t package_index = 0;
     while (package_index < package_number)
     {
-        package_table[package_index].Loop();
+        container_table[package_index].package_ops.Loop();
         package_index += 1;
     }
 }
@@ -956,8 +955,8 @@ void Luos_Flush(void)
  ******************************************************************************/
 void Luos_AddPackage(void (*Init)(void), void (*Loop)(void))
 {
-    package_table[package_number].Init = Init;
-    package_table[package_number].Loop = Loop;
+    container_table[package_number].package_ops.Init = Init;
+    container_table[package_number].package_ops.Loop = Loop;
 
     package_number += 1;
 }
