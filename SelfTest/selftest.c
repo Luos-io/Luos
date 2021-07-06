@@ -38,9 +38,10 @@ void selftest_init(void)
  ******************************************************************************/
 result_t selftest_com(void)
 {
+    uint8_t flag = 0;
     msg_t msg;
-    msg.header.target      = 2;
-    msg.header.target_mode = NODEIDACK;
+    msg.header.target      = 0;
+    msg.header.target_mode = NODEID;
     msg.header.cmd         = IO_STATE;
     msg.header.size        = 5 * sizeof(uint8_t);
     msg.data[0]            = 0xAA;
@@ -48,7 +49,16 @@ result_t selftest_com(void)
     msg.data[2]            = 0xAA;
     msg.data[3]            = 0x55;
     msg.data[4]            = 0xAA;
-    Luos_SendMsg(0, &msg);
+
+    while (1)
+    {
+        Luos_Loop();
+        if (!flag)
+        {
+            Luos_SendMsg(0, &msg);
+            flag = 1;
+        }
+    }
 
     return OK;
 }
@@ -71,7 +81,7 @@ result_t selftest_ptp(void)
  ******************************************************************************/
 void selftest_run(void)
 {
-    //selftest_init();
+    selftest_init();
 
     selftest_com();
     selftest_ptp();
