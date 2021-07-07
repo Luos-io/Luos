@@ -66,7 +66,7 @@ void Recep_GetHeader(volatile uint8_t *data)
     switch (data_count)
     {
         case 1: //reset CRC computation
-#ifdef SNIFFER_H
+#ifdef SNIFFER_H //when we catch the first byte we timestamp the msg
             timestamp[w_pos] = (uint64_t)LuosHAL_GetSystick() * 1000000;
 #endif /* SNIFFER_H */
             ctx.tx.lock = true;
@@ -155,7 +155,6 @@ void Recep_GetData(volatile uint8_t *data)
             {
                 Transmit_SendAck();
             }
-
             // Make an exception for reset detection command
             if (current_msg->header.cmd == RESET_DETECTION)
             {
@@ -168,8 +167,9 @@ void Recep_GetData(volatile uint8_t *data)
             {
                 MsgAlloc_EndMsg();
             }
-#else   //in case of a sniffer we dont send an ACK
+#else
             MsgAlloc_EndMsg();
+            //when the msg reception is successful we advance the ts write position
             w_pos = (w_pos < MAX_MSG_NB - 1) ? w_pos + 1 : 0;
 #endif /* SNIFFER_H */
         }
@@ -513,6 +513,7 @@ uint64_t Recep_GetCorruptionNum(void)
 uint64_t Recep_GetSystick(void)
 {
     uint64_t tt = timestamp[r_pos];
+    //next read position to be ready
     r_pos = (r_pos < MAX_MSG_NB - 1) ? (r_pos + 1) : 0;
     return tt;
 }
