@@ -12,12 +12,12 @@
             "-I inc",
             "-I OD",
             "-I Robus/inc",
-            "-I Network"
+            "-I Robus/Network"
         ],
         "srcFilter": [
             "+<*.c>",
             "+<../Robus/src/*.c>",
-            "+<../Network/*.c>"
+            "+<../Robus/Network/*.c>"
         ]
     },
     "dependencies": [
