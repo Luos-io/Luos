@@ -11,11 +11,13 @@
         "flags": [
             "-I inc",
             "-I OD",
-            "-I Robus/inc"
+            "-I Robus/inc",
+            "-I Network"
         ],
         "srcFilter": [
             "+<*.c>",
-            "+<../Robus/src/*.c>"
+            "+<../Robus/src/*.c>",
+            "+<../Network/*.c>"
         ]
     },
     "dependencies": [

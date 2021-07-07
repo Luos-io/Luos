@@ -10,7 +10,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "luos_hal.h"
-#include "context.h"
+
+#include "network.h"
 
 /*******************************************************************************
  * Definitions
