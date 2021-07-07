@@ -14,6 +14,11 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+typedef enum
+{
+    NODE_INIT,
+    NODE_RUN
+} node_state_t;
 
 /*******************************************************************************
  * Variables
@@ -23,6 +28,7 @@ uint16_t package_number = 0;
 container_t container_table[MAX_CONTAINER_NUMBER];
 uint16_t container_number;
 volatile routing_table_t *routing_table_pt;
+node_state_t node_state = NODE_INIT;
 
 luos_stats_t luos_stats;
 general_stats_t general_stats;
@@ -39,6 +45,9 @@ static void Luos_WriteAlias(uint16_t local_id, uint8_t *alias);
 static error_return_t Luos_ReadAlias(uint16_t local_id, uint8_t *alias);
 static error_return_t Luos_IsALuosCmd(container_t *container, uint8_t cmd, uint16_t size);
 static inline void Luos_EmptyNode(void);
+static inline void Luos_PackageInit(void);
+static inline void Luos_PackageLoop(void);
+static inline void Luos_SetState(node_state_t state);
 
 /******************************************************************************
  * @brief Luos init must be call in project init
@@ -50,20 +59,6 @@ void Luos_Init(void)
     container_number = 0;
     memset(&luos_stats.unmap[0], 0, sizeof(luos_stats_t));
     Robus_Init(&luos_stats.memory);
-
-    uint16_t package_index = 0;
-    if (package_number)
-    {
-        while (package_index < package_number)
-        {
-            container_table[package_index].package_ops.Init();
-            package_index += 1;
-        }
-    }
-    else
-    {
-        Luos_EmptyNode();
-    }
 }
 /******************************************************************************
  * @brief Luos Loop must be call in project loop
@@ -142,13 +137,6 @@ void Luos_Loop(void)
     Luos_AutoUpdateManager();
     // save loop date
     last_loop_date = LuosHAL_GetSystick();
-
-    uint16_t package_index = 0;
-    while (package_index < package_number)
-    {
-        container_table[package_index].package_ops.Loop();
-        package_index += 1;
-    }
 }
 /******************************************************************************
  * @brief Check if this command concern luos
@@ -970,4 +958,77 @@ void Luos_EmptyNode(void)
 {
     revision_t revision = {.unmap = {1, 0, 0}};
     Luos_CreateContainer(0, LUOS_LAST_TYPE, "empty_node", revision);
+}
+
+/******************************************************************************
+ * @brief Run each package Init()
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_PackageInit(void)
+{
+    uint16_t package_index = 0;
+    if (package_number)
+    {
+        while (package_index < package_number)
+        {
+            container_table[package_index].package_ops.Init();
+            package_index += 1;
+        }
+    }
+    else
+    {
+        Luos_EmptyNode();
+    }
+}
+
+/******************************************************************************
+ * @brief Run each package Loop()
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_PackageLoop(void)
+{
+    uint16_t package_index = 0;
+    while (package_index < package_number)
+    {
+        container_table[package_index].package_ops.Loop();
+        package_index += 1;
+    }
+}
+
+/******************************************************************************
+ * @brief Luos high level state machine
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_SetState(node_state_t state)
+{
+    node_state = state;
+}
+
+/******************************************************************************
+ * @brief Luos high level state machine
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_Run(void)
+{
+    switch (node_state)
+    {
+        case NODE_INIT:
+            Luos_Init();
+            Luos_PackageInit();
+            // go to run state after initialization
+            Luos_SetState(NODE_RUN);
+            break;
+        case NODE_RUN:
+            Luos_Loop();
+            Luos_PackageLoop();
+            break;
+        default:
+            Luos_Loop();
+            Luos_PackageLoop();
+            break;
+    }
 }
