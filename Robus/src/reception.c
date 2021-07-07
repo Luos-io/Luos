@@ -146,6 +146,7 @@ void Recep_GetData(volatile uint8_t *data)
             if (current_msg->header.cmd == RESET_DETECTION)
             {
                 ctx.node.node_id = 0;
+                Robus_ContainerIdInit();
                 PortMng_Init();
                 MsgAlloc_Init(NULL);
                 ctx.tx.status = TX_DISABLE;

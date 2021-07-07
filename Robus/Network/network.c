@@ -108,6 +108,7 @@ error_return_t Network_ResetNetworkDetection(ll_container_t *ll_container)
     } while ((MsgAlloc_IsEmpty() != SUCCEED) || (try_nbr > 5));
 
     ctx.node.node_id = 0;
+    Robus_ContainerIdInit();
     PortMng_Init();
     if (try_nbr < 5)
     {

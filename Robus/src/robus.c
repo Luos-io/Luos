@@ -64,6 +64,7 @@ void Robus_Init(memory_stats_t *memory_stats)
     LuosHAL_Init();
 
     // init detection structure
+    Robus_ContainerIdInit();
     PortMng_Init();
 
     // Initialize the robus container status
@@ -89,6 +90,20 @@ void Robus_Loop(void)
             // If not create luos tasks.
             Recep_InterpretMsgProtocol(msg);
         }
+    }
+}
+
+/******************************************************************************
+ * @brief Set Container ID to default ID
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Robus_ContainerIdInit(void)
+{
+    // Reinit ll_container id
+    for (uint8_t i = 0; i < ctx.ll_container_number; i++)
+    {
+        ctx.ll_container_table[i].id = DEFAULTID;
     }
 }
 /******************************************************************************

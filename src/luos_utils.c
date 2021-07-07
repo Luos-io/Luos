@@ -37,6 +37,7 @@ void Luos_assert(char *file, uint32_t line)
 {
     // prepare a message as a node.
     // To do that we have to reset the container ID and clear PTP states to unlock others.
+    Robus_ContainerIdInit();
     PortMng_Init();
     // completely reinit the allocator
     MsgAlloc_Init(NULL);
