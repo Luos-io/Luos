@@ -455,7 +455,7 @@ static void RoutingTB_Share(container_t *container, uint16_t nb_node)
 void RoutingTB_DetectContainers(container_t *container)
 {
     // Starts the topology detection.
-    uint16_t nb_node = Robus_TopologyDetection(container->ll_container);
+    uint16_t nb_node = Network_TopologyDetection(container->ll_container);
     // clear the routing table.
     RoutingTB_Erase();
     // Generate the routing_table

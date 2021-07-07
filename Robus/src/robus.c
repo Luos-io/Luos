@@ -203,7 +203,7 @@ static error_return_t Robus_MsgHandler(msg_t *input)
     switch (input->header.cmd)
     {
         case WRITE_NODE_ID:
-            Routing_MsgHandler(input);
+            Network_MsgHandler(input);
             return SUCCEED;
             break;
         case RESET_DETECTION:

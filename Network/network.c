@@ -44,7 +44,7 @@ static error_return_t Robus_DetectNextNodes(ll_container_t *ll_container);
  * @param ll_container pointer to the detecting ll_container
  * @return The number of detected node.
  ******************************************************************************/
-uint16_t Robus_TopologyDetection(ll_container_t *ll_container)
+uint16_t Network_TopologyDetection(ll_container_t *ll_container)
 {
     uint8_t redetect_nb = 0;
     bool detect_enabled = true;
@@ -171,7 +171,7 @@ error_return_t Robus_DetectNextNodes(ll_container_t *ll_container)
  * @param ll_container pointer to the detecting ll_container
  * @return None.
  ******************************************************************************/
-void Routing_MsgHandler(msg_t *input)
+void Network_MsgHandler(msg_t *input)
 {
     msg_t output_msg;
     node_bootstrap_t node_bootstrap;

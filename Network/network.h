@@ -20,7 +20,7 @@
 /*******************************************************************************
  * Function
  ******************************************************************************/
-uint16_t Robus_TopologyDetection(ll_container_t *ll_container);
-void Routing_MsgHandler(msg_t *input);
+uint16_t Network_TopologyDetection(ll_container_t *ll_container);
+void Network_MsgHandler(msg_t *input);
 
 #endif
