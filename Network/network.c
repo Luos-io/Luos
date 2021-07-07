@@ -36,8 +36,8 @@ volatile uint16_t last_node = 0;
 /*******************************************************************************
  * Function
  ******************************************************************************/
-static error_return_t Robus_ResetNetworkDetection(ll_container_t *ll_container);
-static error_return_t Robus_DetectNextNodes(ll_container_t *ll_container);
+static error_return_t Network_ResetNetworkDetection(ll_container_t *ll_container);
+static error_return_t Network_DetectNextNodes(ll_container_t *ll_container);
 
 /******************************************************************************
  * @brief Start a topology detection procedure
@@ -54,7 +54,7 @@ uint16_t Network_TopologyDetection(ll_container_t *ll_container)
         detect_enabled = false;
 
         // Reset all detection state of containers on the network
-        Robus_ResetNetworkDetection(ll_container);
+        Network_ResetNetworkDetection(ll_container);
 
         // setup local node
         ctx.node.node_id = 1;
@@ -63,7 +63,7 @@ uint16_t Network_TopologyDetection(ll_container_t *ll_container)
         // setup sending ll_container
         ll_container->id = 1;
 
-        if (Robus_DetectNextNodes(ll_container) == FAILED)
+        if (Network_DetectNextNodes(ll_container) == FAILED)
         {
             // check the number of retry we made
             LUOS_ASSERT((redetect_nb <= 4));
@@ -80,7 +80,7 @@ uint16_t Network_TopologyDetection(ll_container_t *ll_container)
  * @param ll_container pointer to the detecting ll_container
  * @return The number of detected node.
  ******************************************************************************/
-error_return_t Robus_ResetNetworkDetection(ll_container_t *ll_container)
+error_return_t Network_ResetNetworkDetection(ll_container_t *ll_container)
 {
     msg_t msg;
     uint8_t try_nbr = 0;
@@ -121,7 +121,7 @@ error_return_t Robus_ResetNetworkDetection(ll_container_t *ll_container)
  * @param ll_container pointer to the detecting ll_container
  * @return None.
  ******************************************************************************/
-error_return_t Robus_DetectNextNodes(ll_container_t *ll_container)
+error_return_t Network_DetectNextNodes(ll_container_t *ll_container)
 {
     // Lets try to poke other nodes
     while (PortMng_PokeNextPort() == SUCCEED)
@@ -217,7 +217,7 @@ void Network_MsgHandler(msg_t *input)
             ctx.node.node_id                    = node_bootstrap.nodeid;
             ctx.node.port_table[ctx.port.activ] = node_bootstrap.prev_nodeid;
             // Continue the topology detection on our other ports.
-            Robus_DetectNextNodes(ll_container);
+            Network_DetectNextNodes(ll_container);
         default:
             break;
     }
