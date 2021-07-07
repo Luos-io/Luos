@@ -20,6 +20,7 @@
 /*******************************************************************************
  * Function
  ******************************************************************************/
+void Network_PortInit(void);
 uint16_t Network_TopologyDetection(ll_container_t *ll_container);
 void Network_MsgHandler(msg_t *input);
 

@@ -65,7 +65,7 @@ void Robus_Init(memory_stats_t *memory_stats)
 
     // init detection structure
     Robus_ContainerIdInit();
-    PortMng_Init();
+    Network_PortInit();
 
     // Initialize the robus container status
     ctx.rx.status.unmap      = 0;

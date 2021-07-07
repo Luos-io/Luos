@@ -6,12 +6,12 @@
  ******************************************************************************/
 #include "luos_utils.h"
 #include "luos.h"
-#include "port_manager.h"
 #include "string.h"
 #include "luos_hal.h"
 #include "msg_alloc.h"
 #include "stdbool.h"
 
+#include "network.h"
 /*******************************************************************************
  * Function
  ******************************************************************************/
@@ -38,7 +38,7 @@ void Luos_assert(char *file, uint32_t line)
     // prepare a message as a node.
     // To do that we have to reset the container ID and clear PTP states to unlock others.
     Robus_ContainerIdInit();
-    PortMng_Init();
+    Network_PortInit();
     // completely reinit the allocator
     MsgAlloc_Init(NULL);
     msg_t msg;

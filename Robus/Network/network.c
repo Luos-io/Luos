@@ -11,6 +11,7 @@
 #include "luos_utils.h"
 #include <string.h>
 #include "luos_hal.h"
+#include "port_manager.h"
 
 /*******************************************************************************
  * Definitions
@@ -38,6 +39,16 @@ volatile uint16_t last_node = 0;
  ******************************************************************************/
 static error_return_t Network_ResetNetworkDetection(ll_container_t *ll_container);
 static error_return_t Network_DetectNextNodes(ll_container_t *ll_container);
+
+/******************************************************************************
+ * @brief Initiliaze network port
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Network_PortInit(void)
+{
+    PortMng_Init();
+}
 
 /******************************************************************************
  * @brief Start a topology detection procedure
@@ -109,7 +120,7 @@ error_return_t Network_ResetNetworkDetection(ll_container_t *ll_container)
 
     ctx.node.node_id = 0;
     Robus_ContainerIdInit();
-    PortMng_Init();
+    Network_PortInit();
     if (try_nbr < 5)
     {
         return SUCCEED;

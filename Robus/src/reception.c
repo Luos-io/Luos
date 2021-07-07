@@ -14,6 +14,8 @@
 #include "msg_alloc.h"
 #include "luos_utils.h"
 
+#include "network.h"
+
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -147,7 +149,7 @@ void Recep_GetData(volatile uint8_t *data)
             {
                 ctx.node.node_id = 0;
                 Robus_ContainerIdInit();
-                PortMng_Init();
+                Network_PortInit();
                 MsgAlloc_Init(NULL);
                 ctx.tx.status = TX_DISABLE;
             }
