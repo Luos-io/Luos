@@ -25,6 +25,7 @@ typedef enum
  ******************************************************************************/
 revision_t luos_version = {.Major = 1, .Minor = 2, .Build = 0};
 uint16_t package_number = 0;
+package_t package_table[MAX_CONTAINER_NUMBER];
 container_t container_table[MAX_CONTAINER_NUMBER];
 uint16_t container_number;
 volatile routing_table_t *routing_table_pt;
@@ -943,8 +944,8 @@ void Luos_Flush(void)
  ******************************************************************************/
 void Luos_AddPackage(void (*Init)(void), void (*Loop)(void))
 {
-    container_table[package_number].package_ops.Init = Init;
-    container_table[package_number].package_ops.Loop = Loop;
+    package_table[package_number].Init = Init;
+    package_table[package_number].Loop = Loop;
 
     package_number += 1;
 }
@@ -972,7 +973,7 @@ void Luos_PackageInit(void)
     {
         while (package_index < package_number)
         {
-            container_table[package_index].package_ops.Init();
+            package_table[package_index].Init();
             package_index += 1;
         }
     }
@@ -992,7 +993,7 @@ void Luos_PackageLoop(void)
     uint16_t package_index = 0;
     while (package_index < package_number)
     {
-        container_table[package_index].package_ops.Loop();
+        package_table[package_index].Loop();
         package_index += 1;
     }
 }

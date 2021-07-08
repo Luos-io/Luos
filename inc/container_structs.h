@@ -94,7 +94,6 @@ typedef struct __attribute__((__packed__)) container_t
     revision_t revision;                   /*!< container firmware version. */
     luos_stats_t *node_statistics;         /*!< Node level statistics. */
     container_stats_t statistics;          /*!< container level statistics. */
-    package_t package_ops;                 /*!< package initilization and loop functions */
 } container_t;
 
 typedef void (*CONT_CB)(container_t *container, msg_t *msg);
