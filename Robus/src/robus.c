@@ -221,6 +221,10 @@ static error_return_t Robus_MsgHandler(msg_t *input)
     switch (input->header.cmd)
     {
         case WRITE_NODE_ID:
+        case CONNECT_MEMBER:
+        case ACCEPT_CONNECTION:
+        case DISCOVER_NEIGHBORS:
+        case TOPOLOGY_INFORMATION:
             Network_MsgHandler(input);
             return SUCCEED;
             break;

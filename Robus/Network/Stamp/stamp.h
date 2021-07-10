@@ -12,13 +12,8 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define GROUP_LEADER_ID 1
-
-typedef enum
-{
-    GROUP_LEADER,
-    GROUP_MEMBER
-} stamp_role_t;
+#define GROUP_LEADER_ID       1
+#define FIRST_GROUP_MEMBER_ID 2
 
 /*******************************************************************************
  * Variables

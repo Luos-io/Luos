@@ -65,7 +65,12 @@ void Network_MsgHandler(msg_t *input)
 #endif
 
 #ifdef STAMP_DETECTION
+#ifdef GROUP_MEMBER
     Stamp_MemberMsgHandler(input);
+#endif
+#ifdef GROUP_LEADER
+    Stamp_LeaderMsgHandler(input);
+#endif
 #endif
 }
 
@@ -77,6 +82,11 @@ void Network_MsgHandler(msg_t *input)
 void Network_Loop(void)
 {
 #ifdef STAMP_DETECTION
+#ifdef GROUP_MEMBER
     Stamp_MemberLoop();
+#endif
+#ifdef GROUP_LEADER
+    Stamp_LeaderLoop();
+#endif
 #endif
 }
