@@ -91,6 +91,9 @@ void Robus_Loop(void)
             Recep_InterpretMsgProtocol(msg);
         }
     }
+
+    // network management
+    Network_Loop();
 }
 
 /******************************************************************************
@@ -268,5 +271,5 @@ void Robus_Flush(void)
  ******************************************************************************/
 ll_container_t *Robus_GetContainer(uint16_t container_id)
 {
-    return &ctx.ll_container_table[container_id];
+    return (ll_container_t *)&ctx.ll_container_table[container_id];
 }

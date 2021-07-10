@@ -6,6 +6,7 @@
  ******************************************************************************/
 
 #include "legacy.h"
+#include "stamp.h"
 #include "robus_struct.h"
 
 /*******************************************************************************
@@ -27,7 +28,13 @@
  ******************************************************************************/
 void Network_PortInit(void)
 {
+#ifdef LEGACY_DETECTION
     Legacy_PortInit();
+#endif
+
+#ifdef STAMP_DETECTION
+
+#endif
 }
 
 /******************************************************************************
@@ -37,8 +44,15 @@ void Network_PortInit(void)
  ******************************************************************************/
 uint16_t Network_TopologyDetection(ll_container_t *ll_container)
 {
+#ifdef LEGACY_DETECTION
     return Legacy_TopologyDetection(ll_container);
+#endif
+
+#ifdef STAMP_DETECTION
+    return 0;
+#endif
 }
+
 /******************************************************************************
  * @brief run the procedure allowing to detect the next nodes on the next port
  * @param ll_container pointer to the detecting ll_container
@@ -46,5 +60,23 @@ uint16_t Network_TopologyDetection(ll_container_t *ll_container)
  ******************************************************************************/
 void Network_MsgHandler(msg_t *input)
 {
-    return Legacy_MsgHandler(input);
+#ifdef LEGACY_DETECTION
+    Legacy_MsgHandler(input);
+#endif
+
+#ifdef STAMP_DETECTION
+    Stamp_MemberMsgHandler(input);
+#endif
+}
+
+/******************************************************************************
+ * @brief run the procedure allowing to detect the next nodes on the next port
+ * @param ll_container pointer to the detecting ll_container
+ * @return None.
+ ******************************************************************************/
+void Network_Loop(void)
+{
+#ifdef STAMP_DETECTION
+    Stamp_MemberLoop();
+#endif
 }

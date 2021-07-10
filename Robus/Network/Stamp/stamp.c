@@ -39,7 +39,7 @@ uint8_t nb_retry           = 0;
 /*******************************************************************************
  * Function
  ******************************************************************************/
-static inline bool Stamp_Connect(void);
+static inline void Stamp_Connect(void);
 
 /******************************************************************************
  * @brief Stamp machine state
@@ -56,7 +56,7 @@ void Stamp_SetState(stamp_state_t state)
  * @param None
  * @return None
  ******************************************************************************/
-void Stamp_MemberLoop()
+void Stamp_MemberLoop(void)
 {
     switch (stamp_state)
     {
@@ -76,7 +76,7 @@ void Stamp_MemberLoop()
             }
             break;
         case RUN:
-            Stamp_MemberRun();
+            //Stamp_MemberRun();
             break;
         default:
             Stamp_SetState(CONNECT);
@@ -89,7 +89,7 @@ void Stamp_MemberLoop()
  * @param None
  * @return None
  ******************************************************************************/
-bool Stamp_Connect(void)
+void Stamp_Connect(void)
 {
     msg_t connect_msg;
 
@@ -106,10 +106,13 @@ bool Stamp_Connect(void)
             // send CONNECT_MEMBER message if timeout is reached
             if (LuosHAL_GetSystick() - tick_start > connect_period)
             {
+                connect_retry = false;
+                nb_retry += 1;
+
                 connect_msg.header.cmd         = CONNECT_MEMBER;
                 connect_msg.header.size        = 0;
                 connect_msg.header.target      = GROUP_LEADER_ID;
-                connect_msg.header.target_mode = NODEIDACK;
+                connect_msg.header.target_mode = NODEID;
 
                 ll_container_t *node_container = Robus_GetContainer(0);
                 Robus_SendMsg(node_container, &connect_msg);
@@ -140,7 +143,7 @@ void Stamp_MemberMsgHandler(msg_t *msg)
  * @param None
  * @return None
  ******************************************************************************/
-void Stamp_LeaderLoop()
+void Stamp_LeaderLoop(void)
 {
 
     switch (stamp_state)
@@ -149,7 +152,7 @@ void Stamp_LeaderLoop()
             Stamp_SetState(RUN);
             break;
         case RUN:
-            Stamp_LeaderRun();
+            //Stamp_LeaderRun();
             break;
         default:
             break;

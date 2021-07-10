@@ -36,9 +36,9 @@ typedef enum
  * Function
  ******************************************************************************/
 void Stamp_MemberMsgHandler(msg_t *input);
-void Stamp_Memberloop();
+void Stamp_MemberLoop(void);
 
 void Stamp_LeaderMsgHandler(msg_t *input);
-void Stamp_Leaderloop();
+void Stamp_LeaderLoop(void);
 
 #endif
