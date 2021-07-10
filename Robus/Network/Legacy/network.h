@@ -1,5 +1,5 @@
 /******************************************************************************
- * @file routing algorithm
+ * @file Legacy routing algorithm
  * @brief functions to make possible network detection
  * @author Luos
  * @version 0.0.0
