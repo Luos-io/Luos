@@ -5,7 +5,7 @@
  * @version 0.0.0
  ******************************************************************************/
 
-#include "network.h"
+#include "legacy.h"
 #include "msg_alloc.h"
 #include <stdbool.h>
 #include "luos_utils.h"
@@ -37,15 +37,15 @@ volatile uint16_t last_node = 0;
 /*******************************************************************************
  * Function
  ******************************************************************************/
-static error_return_t Network_ResetNetworkDetection(ll_container_t *ll_container);
-static error_return_t Network_DetectNextNodes(ll_container_t *ll_container);
+static error_return_t Legacy_ResetNetworkDetection(ll_container_t *ll_container);
+static error_return_t Legacy_DetectNextNodes(ll_container_t *ll_container);
 
 /******************************************************************************
  * @brief Initiliaze network port
  * @param None
  * @return None
  ******************************************************************************/
-void Network_PortInit(void)
+void Legacy_PortInit(void)
 {
     PortMng_Init();
 }
@@ -55,7 +55,7 @@ void Network_PortInit(void)
  * @param ll_container pointer to the detecting ll_container
  * @return The number of detected node.
  ******************************************************************************/
-uint16_t Network_TopologyDetection(ll_container_t *ll_container)
+uint16_t Legacy_TopologyDetection(ll_container_t *ll_container)
 {
     uint8_t redetect_nb = 0;
     bool detect_enabled = true;
@@ -65,7 +65,7 @@ uint16_t Network_TopologyDetection(ll_container_t *ll_container)
         detect_enabled = false;
 
         // Reset all detection state of containers on the network
-        Network_ResetNetworkDetection(ll_container);
+        Legacy_ResetNetworkDetection(ll_container);
 
         // setup local node
         ctx.node.node_id = 1;
@@ -74,7 +74,7 @@ uint16_t Network_TopologyDetection(ll_container_t *ll_container)
         // setup sending ll_container
         ll_container->id = 1;
 
-        if (Network_DetectNextNodes(ll_container) == FAILED)
+        if (Legacy_DetectNextNodes(ll_container) == FAILED)
         {
             // check the number of retry we made
             LUOS_ASSERT((redetect_nb <= 4));
@@ -91,7 +91,7 @@ uint16_t Network_TopologyDetection(ll_container_t *ll_container)
  * @param ll_container pointer to the detecting ll_container
  * @return The number of detected node.
  ******************************************************************************/
-error_return_t Network_ResetNetworkDetection(ll_container_t *ll_container)
+error_return_t Legacy_ResetNetworkDetection(ll_container_t *ll_container)
 {
     msg_t msg;
     uint8_t try_nbr = 0;
@@ -120,7 +120,7 @@ error_return_t Network_ResetNetworkDetection(ll_container_t *ll_container)
 
     ctx.node.node_id = 0;
     Robus_ContainerIdInit();
-    Network_PortInit();
+    Legacy_PortInit();
     if (try_nbr < 5)
     {
         return SUCCEED;
@@ -133,7 +133,7 @@ error_return_t Network_ResetNetworkDetection(ll_container_t *ll_container)
  * @param ll_container pointer to the detecting ll_container
  * @return None.
  ******************************************************************************/
-error_return_t Network_DetectNextNodes(ll_container_t *ll_container)
+error_return_t Legacy_DetectNextNodes(ll_container_t *ll_container)
 {
     // Lets try to poke other nodes
     while (PortMng_PokeNextPort() == SUCCEED)
@@ -183,7 +183,7 @@ error_return_t Network_DetectNextNodes(ll_container_t *ll_container)
  * @param ll_container pointer to the detecting ll_container
  * @return None.
  ******************************************************************************/
-void Network_MsgHandler(msg_t *input)
+void Legacy_MsgHandler(msg_t *input)
 {
     msg_t output_msg;
     node_bootstrap_t node_bootstrap;
@@ -229,7 +229,7 @@ void Network_MsgHandler(msg_t *input)
             ctx.node.node_id                    = node_bootstrap.nodeid;
             ctx.node.port_table[ctx.port.activ] = node_bootstrap.prev_nodeid;
             // Continue the topology detection on our other ports.
-            Network_DetectNextNodes(ll_container);
+            Legacy_DetectNextNodes(ll_container);
         default:
             break;
     }

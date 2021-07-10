@@ -4,8 +4,8 @@
  * @author Luos
  * @version 0.0.0
  ******************************************************************************/
-#ifndef NETWORK_H
-#define NETWORK_H
+#ifndef LEGACY_H
+#define LEGACY_H
 
 #include "context.h"
 
@@ -20,8 +20,8 @@
 /*******************************************************************************
  * Function
  ******************************************************************************/
-void Network_PortInit(void);
-uint16_t Network_TopologyDetection(ll_container_t *ll_container);
-void Network_MsgHandler(msg_t *input);
+void Legacy_PortInit(void);
+uint16_t Legacy_TopologyDetection(ll_container_t *ll_container);
+void Legacy_MsgHandler(msg_t *input);
 
 #endif

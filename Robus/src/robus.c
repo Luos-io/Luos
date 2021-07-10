@@ -260,3 +260,13 @@ void Robus_Flush(void)
     MsgAlloc_Init(NULL);
     LuosHAL_SetIrqState(true);
 }
+
+/******************************************************************************
+ * @brief get container structure
+ * @param None
+ * @return Node pointer
+ ******************************************************************************/
+ll_container_t *Robus_GetContainer(uint16_t container_id)
+{
+    return &ctx.ll_container_table[container_id];
+}
