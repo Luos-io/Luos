@@ -135,10 +135,20 @@ typedef struct __attribute__((__packed__))
 typedef enum
 {
     // protocol level command
+
+    // Legacy Detection
     WRITE_NODE_ID,   /*!< Get and save a new given node ID. */
     RESET_DETECTION, /*!< Reset detection*/
-    SET_BAUDRATE,    /*!< Set Robus baudrate*/
-    ASSERT,          /*!< Node Assert message (only broadcast with a source as a node */
+
+    // STAMP Detection
+    CONNECT_MEMBER,
+    ACCEPT_CONNECTION,
+    DISCOVER_NEIGHBORS,
+    TOPOLOGY_INFORMATION,
+
+    // others commands
+    SET_BAUDRATE, /*!< Set Robus baudrate*/
+    ASSERT,       /*!< Node Assert message (only broadcast with a source as a node */
     ROBUS_PROTOCOL_NB,
 } robus_cmd_t;
 

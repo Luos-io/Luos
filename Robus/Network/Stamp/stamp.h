@@ -16,14 +16,6 @@
 
 typedef enum
 {
-    CONNECT_MEMBER,
-    ACCEPT_CONNECTION,
-    DISCOVER_NEIGHBORS,
-    TOPOLOGY_INFORMATION
-} stamp_msg_t;
-
-typedef enum
-{
     GROUP_LEADER,
     GROUP_MEMBER
 } stamp_role_t;
