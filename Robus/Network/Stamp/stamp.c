@@ -31,7 +31,7 @@ typedef enum
 typedef enum
 {
     POWER,
-    CONNECT,
+    SERVICE_ID,
     RUN
 } stamp_leader_state_t;
 #endif
@@ -58,10 +58,11 @@ uint16_t current_node_id          = FIRST_GROUP_MEMBER_ID;
 /*******************************************************************************
  * Function
  ******************************************************************************/
+static inline void Stamp_SetServicesID(void);
+
 #ifdef GROUP_MEMBER
 // member functions
 static inline void Stamp_MemberConnect(void);
-static inline void Stamp_SetServicesID(void);
 #endif
 
 #ifdef GROUP_LEADER
@@ -166,32 +167,6 @@ void Stamp_MemberConnect(void)
 
 #ifdef GROUP_MEMBER
 /******************************************************************************
- * @brief set ID for local services
- * @param None
- * @return None
- ******************************************************************************/
-void Stamp_SetServicesID(void)
-{
-    ll_container_t *container;
-    uint16_t container_index  = 0;
-    uint16_t container_number = Robus_GetContainerNumber();
-    node_t *node              = Robus_GetNode();
-    // init the first service id with the node id
-    uint16_t service_id = node->node_id;
-
-    while (container_index < container_number)
-    {
-        container     = Robus_GetContainerFromID(container_index);
-        container->id = service_id;
-
-        container_index += 1;
-        service_id += 1;
-    }
-}
-#endif
-
-#ifdef GROUP_MEMBER
-/******************************************************************************
  * @brief Stamp member message handler
  * @param None
  * @return None
@@ -238,6 +213,10 @@ void Stamp_LeaderLoop(void)
             // set member node id
             node->node_id = GROUP_LEADER_ID;
             // go to run state
+            Stamp_SetLeaderState(SERVICE_ID);
+            break;
+        case SERVICE_ID:
+            Stamp_SetServicesID();
             Stamp_SetLeaderState(RUN);
             break;
         case RUN:
@@ -294,3 +273,27 @@ void Stamp_LeaderMsgHandler(msg_t *msg)
     }
 }
 #endif
+
+/******************************************************************************
+ * @brief set ID for local services
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Stamp_SetServicesID(void)
+{
+    ll_container_t *container;
+    uint16_t container_index  = 0;
+    uint16_t container_number = Robus_GetContainerNumber();
+    node_t *node              = Robus_GetNode();
+    // init the first service id with the node id
+    uint16_t service_id = node->node_id;
+
+    while (container_index < container_number)
+    {
+        container     = Robus_GetContainerFromID(container_index);
+        container->id = service_id;
+
+        container_index += 1;
+        service_id += 1;
+    }
+}
