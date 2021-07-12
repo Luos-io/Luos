@@ -55,7 +55,7 @@ uint16_t Network_TopologyDetection(ll_container_t *ll_container)
 
 /******************************************************************************
  * @brief run the procedure allowing to detect the next nodes on the next port
- * @param ll_container pointer to the detecting ll_container
+ * @param input message received from luos network
  * @return None.
  ******************************************************************************/
 void Network_MsgHandler(msg_t *input)
@@ -76,7 +76,7 @@ void Network_MsgHandler(msg_t *input)
 
 /******************************************************************************
  * @brief run the procedure allowing to detect the next nodes on the next port
- * @param ll_container pointer to the detecting ll_container
+ * @param None
  * @return None.
  ******************************************************************************/
 void Network_Loop(void)
