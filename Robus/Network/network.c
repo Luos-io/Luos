@@ -5,6 +5,7 @@
  * @version 0.0.0
  ******************************************************************************/
 
+#include "network.h"
 #include "legacy.h"
 #include "stamp.h"
 #include "robus_struct.h"
