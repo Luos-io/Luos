@@ -46,7 +46,7 @@ uint16_t current_node_id = FIRST_GROUP_MEMBER_ID;
 static inline void Stamp_Connect(void);
 
 // leader functions
-static inline void Stamp_LeaderRun(void);
+static inline void Stamp_LeaderAccept(void);
 
 /******************************************************************************
  * @brief Stamp machine state
@@ -159,14 +159,22 @@ void Stamp_MemberMsgHandler(msg_t *msg)
  ******************************************************************************/
 void Stamp_LeaderLoop(void)
 {
-
+    node_t *node = Robus_GetNode();
     switch (stamp_state)
     {
         case POWER:
+            // set member node id
+            node->node_id = GROUP_LEADER_ID;
+            // go to run state
             Stamp_SetState(RUN);
             break;
         case RUN:
-            Stamp_LeaderRun();
+            if (member_connect_rcv)
+            {
+                Stamp_LeaderAccept();
+                // reset for next connection
+                member_connect_rcv = false;
+            }
             break;
         default:
             break;
@@ -178,19 +186,19 @@ void Stamp_LeaderLoop(void)
  * @param None
  * @return None
  ******************************************************************************/
-void Stamp_LeaderRun(void)
+void Stamp_LeaderAccept(void)
 {
     msg_t connect_msg;
-    if (member_connect_rcv)
-    {
-        connect_msg.header.cmd         = CONNECT_MEMBER;
-        connect_msg.header.size        = 0;
-        connect_msg.header.target      = GROUP_LEADER_ID;
-        connect_msg.header.target_mode = NODEID;
+    connect_msg.header.cmd         = ACCEPT_CONNECTION;
+    connect_msg.header.size        = sizeof(uint16_t);
+    connect_msg.header.target      = 0;
+    connect_msg.header.target_mode = NODEID;
 
-        ll_container_t *node_container = Robus_GetContainer(0);
-        Robus_SendMsg(node_container, &connect_msg);
-    }
+    // set member ID
+    connect_msg.data[0] = FIRST_GROUP_MEMBER_ID;
+
+    ll_container_t *node_container = Robus_GetContainer(0);
+    Robus_SendMsg(node_container, &connect_msg);
 }
 
 /******************************************************************************
