@@ -28,6 +28,7 @@ void Robus_ContainersClear(void);
 error_return_t Robus_SendMsg(ll_container_t *ll_container, msg_t *msg);
 node_t *Robus_GetNode(void);
 void Robus_Flush(void);
-ll_container_t *Robus_GetContainer(uint16_t container_id);
+ll_container_t *Robus_GetContainerFromID(uint16_t container_id);
+uint16_t Robus_GetContainerNumber(void);
 
 #endif /* _ROBUS_H_ */

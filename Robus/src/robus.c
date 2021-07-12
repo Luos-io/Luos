@@ -273,7 +273,17 @@ void Robus_Flush(void)
  * @param None
  * @return Node pointer
  ******************************************************************************/
-ll_container_t *Robus_GetContainer(uint16_t container_id)
+ll_container_t *Robus_GetContainerFromID(uint16_t container_id)
 {
     return (ll_container_t *)&ctx.ll_container_table[container_id];
+}
+
+/******************************************************************************
+ * @brief get container number
+ * @param None
+ * @return container number
+ ******************************************************************************/
+uint16_t Robus_GetContainerNumber(void)
+{
+    return ctx.ll_container_number;
 }
