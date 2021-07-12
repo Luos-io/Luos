@@ -21,8 +21,8 @@ typedef enum
 {
     POWER,
     CONNECT,
-    SET_SERVICE_ID,
-    RUN
+    SERVICE_ID,
+    FORWARD
 } stamp_member_state_t;
 #endif
 
@@ -98,7 +98,7 @@ void Stamp_MemberLoop(void)
             // have we received an ACCEPT_CONNECTION message ?
             if (accept_connection_rcv == true)
             {
-                Stamp_SetMemberState(SET_SERVICE_ID);
+                Stamp_SetMemberState(SERVICE_ID);
             }
             else
             {
@@ -106,11 +106,11 @@ void Stamp_MemberLoop(void)
                 Stamp_MemberConnect();
             }
             break;
-        case SET_SERVICE_ID:
+        case SERVICE_ID:
             Stamp_SetServicesID();
-            Stamp_SetMemberState(RUN);
+            Stamp_SetMemberState(FORWARD);
             break;
-        case RUN:
+        case FORWARD:
             //Stamp_MemberRun();
             break;
         default:
@@ -156,7 +156,7 @@ void Stamp_MemberConnect(void)
                 connect_msg.header.target      = GROUP_LEADER_ID;
                 connect_msg.header.target_mode = NODEID;
 
-                ll_container_t *node_container = Robus_GetContainer(0);
+                ll_container_t *node_container = Robus_GetContainerFromID(0);
                 Robus_SendMsg(node_container, &connect_msg);
             }
         }
@@ -172,6 +172,21 @@ void Stamp_MemberConnect(void)
  ******************************************************************************/
 void Stamp_SetServicesID(void)
 {
+    ll_container_t *container;
+    uint16_t container_index  = 0;
+    uint16_t container_number = Robus_GetContainerNumber();
+    node_t *node              = Robus_GetNode();
+    // init the first service id with the node id
+    uint16_t service_id = node->node_id;
+
+    while (container_index < container_number)
+    {
+        container     = Robus_GetContainerFromID(container_index);
+        container->id = service_id;
+
+        container_index += 1;
+        service_id += 1;
+    }
 }
 #endif
 
@@ -256,7 +271,7 @@ void Stamp_LeaderAccept(void)
     // set member ID
     connect_msg.data[0] = current_node_id;
 
-    ll_container_t *node_container = Robus_GetContainer(0);
+    ll_container_t *node_container = Robus_GetContainerFromID(0);
     Robus_SendMsg(node_container, &connect_msg);
 }
 #endif
