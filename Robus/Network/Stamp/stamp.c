@@ -13,53 +13,75 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define MAX_CONNECTION_RETRY 8
 
+#ifdef GROUP_MEMBER
+// member specific variables
+#define MAX_CONNECTION_RETRY 8
+typedef enum
+{
+    POWER,
+    CONNECT,
+    SET_SERVICE_ID,
+    RUN
+} stamp_member_state_t;
+#endif
+
+#ifdef GROUP_LEADER
+// leader specific variables
 typedef enum
 {
     POWER,
     CONNECT,
     RUN
-} stamp_state_t;
-stamp_state_t stamp_state = POWER;
-
-// member specific variables
-bool accept_connection_rcv = false;
-uint32_t tick_start        = 0;
-bool connect_retry         = false;
-uint32_t connect_period    = 0;
-uint8_t nb_retry           = 0;
-volatile static uint16_t node_id;
-
-bool test_flag = true;
-
-// leader specific variables
-bool member_connect_rcv  = false;
-uint16_t current_node_id = FIRST_GROUP_MEMBER_ID;
+} stamp_leader_state_t;
+#endif
 
 /*******************************************************************************
  * Variables
  ******************************************************************************/
+#ifdef GROUP_MEMBER
+stamp_member_state_t member_state = POWER;
+bool accept_connection_rcv        = false;
+uint32_t tick_start               = 0;
+bool connect_retry                = false;
+uint32_t connect_period           = 0;
+uint8_t nb_retry                  = 0;
+volatile static uint16_t node_id;
+#endif
+
+#ifdef GROUP_LEADER
+stamp_leader_state_t leader_state = POWER;
+bool member_connect_rcv           = false;
+uint16_t current_node_id          = FIRST_GROUP_MEMBER_ID;
+#endif
 
 /*******************************************************************************
  * Function
  ******************************************************************************/
+#ifdef GROUP_MEMBER
 // member functions
-static inline void Stamp_Connect(void);
+static inline void Stamp_MemberConnect(void);
+static inline void Stamp_SetServicesID(void);
+#endif
 
+#ifdef GROUP_LEADER
 // leader functions
 static inline void Stamp_LeaderAccept(void);
+#endif
 
+#ifdef GROUP_MEMBER
 /******************************************************************************
  * @brief Stamp machine state
  * @param ll_container pointer to the detecting ll_container
  * @return The number of detected node.
  ******************************************************************************/
-void Stamp_SetState(stamp_state_t state)
+void Stamp_SetMemberState(stamp_member_state_t state)
 {
-    stamp_state = state;
+    member_state = state;
 }
+#endif
 
+#ifdef GROUP_MEMBER
 /******************************************************************************
  * @brief Stamp member machine state
  * @param None
@@ -67,38 +89,44 @@ void Stamp_SetState(stamp_state_t state)
  ******************************************************************************/
 void Stamp_MemberLoop(void)
 {
-    switch (stamp_state)
+    switch (member_state)
     {
         case POWER:
-            Stamp_SetState(CONNECT);
+            Stamp_SetMemberState(CONNECT);
             break;
         case CONNECT:
             // have we received an ACCEPT_CONNECTION message ?
             if (accept_connection_rcv == true)
             {
-                Stamp_SetState(RUN);
+                Stamp_SetMemberState(SET_SERVICE_ID);
             }
             else
             {
-                Stamp_Connect();
                 // try to connect
+                Stamp_MemberConnect();
             }
+            break;
+        case SET_SERVICE_ID:
+            Stamp_SetServicesID();
+            Stamp_SetMemberState(RUN);
             break;
         case RUN:
             //Stamp_MemberRun();
             break;
         default:
-            Stamp_SetState(CONNECT);
+            Stamp_SetMemberState(CONNECT);
             break;
     }
 }
+#endif
 
+#ifdef GROUP_MEMBER
 /******************************************************************************
  * @brief Stamp member machine state
  * @param None
  * @return None
  ******************************************************************************/
-void Stamp_Connect(void)
+void Stamp_MemberConnect(void)
 {
     msg_t connect_msg;
 
@@ -134,7 +162,20 @@ void Stamp_Connect(void)
         }
     }
 }
+#endif
 
+#ifdef GROUP_MEMBER
+/******************************************************************************
+ * @brief set ID for local services
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Stamp_SetServicesID(void)
+{
+}
+#endif
+
+#ifdef GROUP_MEMBER
 /******************************************************************************
  * @brief Stamp member message handler
  * @param None
@@ -153,7 +194,21 @@ void Stamp_MemberMsgHandler(msg_t *msg)
             break;
     }
 }
+#endif
 
+#ifdef GROUP_LEADER
+/******************************************************************************
+ * @brief Stamp machine state
+ * @param next state
+ * @return None
+ ******************************************************************************/
+void Stamp_SetLeaderState(stamp_leader_state_t state)
+{
+    leader_state = state;
+}
+#endif
+
+#ifdef GROUP_LEADER
 /******************************************************************************
  * @brief Stamp Leader machine state
  * @param None
@@ -162,13 +217,13 @@ void Stamp_MemberMsgHandler(msg_t *msg)
 void Stamp_LeaderLoop(void)
 {
     node_t *node = Robus_GetNode();
-    switch (stamp_state)
+    switch (leader_state)
     {
         case POWER:
             // set member node id
             node->node_id = GROUP_LEADER_ID;
             // go to run state
-            Stamp_SetState(RUN);
+            Stamp_SetLeaderState(RUN);
             break;
         case RUN:
             if (member_connect_rcv)
@@ -182,7 +237,9 @@ void Stamp_LeaderLoop(void)
             break;
     }
 }
+#endif
 
+#ifdef GROUP_LEADER
 /******************************************************************************
  * @brief Stamp Leader machine state
  * @param None
@@ -197,12 +254,14 @@ void Stamp_LeaderAccept(void)
     connect_msg.header.target_mode = NODEID;
 
     // set member ID
-    connect_msg.data[0] = FIRST_GROUP_MEMBER_ID;
+    connect_msg.data[0] = current_node_id;
 
     ll_container_t *node_container = Robus_GetContainer(0);
     Robus_SendMsg(node_container, &connect_msg);
 }
+#endif
 
+#ifdef GROUP_LEADER
 /******************************************************************************
  * @brief Stamp leader message handler
  * @param None
@@ -219,3 +278,4 @@ void Stamp_LeaderMsgHandler(msg_t *msg)
             break;
     }
 }
+#endif
