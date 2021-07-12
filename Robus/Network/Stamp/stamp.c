@@ -31,6 +31,8 @@ uint32_t connect_period    = 0;
 uint8_t nb_retry           = 0;
 volatile static uint16_t node_id;
 
+bool test_flag = true;
+
 // leader specific variables
 bool member_connect_rcv  = false;
 uint16_t current_node_id = FIRST_GROUP_MEMBER_ID;
@@ -78,8 +80,8 @@ void Stamp_MemberLoop(void)
             }
             else
             {
-                // try to connect
                 Stamp_Connect();
+                // try to connect
             }
             break;
         case RUN:
@@ -100,7 +102,7 @@ void Stamp_Connect(void)
 {
     msg_t connect_msg;
 
-    while (nb_retry < MAX_CONNECTION_RETRY)
+    if (nb_retry < MAX_CONNECTION_RETRY)
     {
         if (!connect_retry)
         {
