@@ -13,7 +13,7 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define MAX_CONNECTION_RETRY 5
+#define MAX_CONNECTION_RETRY 8
 
 typedef enum
 {
@@ -27,7 +27,7 @@ stamp_state_t stamp_state = POWER;
 bool accept_connection_rcv = false;
 uint32_t tick_start        = 0;
 bool connect_retry         = false;
-uint32_t connect_period    = 10;
+uint32_t connect_period    = 0;
 uint8_t nb_retry           = 0;
 volatile static uint16_t node_id;
 
@@ -104,16 +104,21 @@ void Stamp_Connect(void)
     {
         if (!connect_retry)
         {
-            connect_retry  = true;
-            connect_period = connect_period * 2;
-            tick_start     = LuosHAL_GetSystick();
+            connect_retry = true;
+            tick_start    = LuosHAL_GetSystick();
+
+            if (nb_retry == 1)
+            {
+                connect_period = 10;
+            }
         }
         else
         {
             // send CONNECT_MEMBER message if timeout is reached
             if (LuosHAL_GetSystick() - tick_start > connect_period)
             {
-                connect_retry = false;
+                connect_period = connect_period * 2;
+                connect_retry  = false;
                 nb_retry += 1;
 
                 connect_msg.header.cmd         = CONNECT_MEMBER;
