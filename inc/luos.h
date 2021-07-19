@@ -17,6 +17,11 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+// Initialise package with a macro
+#define LUOS_ADD_PACKAGE(_name) \
+    Luos_AddPackage(_name##_Init, _name##_Loop);
+
+#define LUOS_RUN() Luos_Run();
 
 /******************************************************************************
  * @struct general_stats_t
@@ -58,5 +63,7 @@ uint16_t Luos_NbrAvailableMsg(void);
 uint32_t Luos_GetSystick(void);
 error_return_t Luos_TxComplete(void);
 void Luos_Flush(void);
+void Luos_AddPackage(void (*Init)(void), void (*Loop)(void));
+void Luos_Run(void);
 
 #endif /* LUOS_H */

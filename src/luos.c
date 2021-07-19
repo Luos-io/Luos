@@ -10,18 +10,27 @@
 #include "msg_alloc.h"
 #include "robus.h"
 #include "luos_hal.h"
+#include "bootloader_core.h"
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+typedef enum
+{
+    NODE_INIT,
+    NODE_RUN
+} node_state_t;
 
 /*******************************************************************************
  * Variables
  ******************************************************************************/
 revision_t luos_version = {.Major = 1, .Minor = 3, .Build = 0};
+package_t package_table[MAX_CONTAINER_NUMBER];
+uint16_t package_number = 0;
 container_t container_table[MAX_CONTAINER_NUMBER];
-uint16_t container_number;
+uint16_t container_number = 0;
 volatile routing_table_t *routing_table_pt;
+node_state_t node_state = NODE_INIT;
 
 luos_stats_t luos_stats;
 general_stats_t general_stats;
@@ -37,6 +46,10 @@ static error_return_t Luos_SaveAlias(container_t *container, uint8_t *alias);
 static void Luos_WriteAlias(uint16_t local_id, uint8_t *alias);
 static error_return_t Luos_ReadAlias(uint16_t local_id, uint8_t *alias);
 static error_return_t Luos_IsALuosCmd(container_t *container, uint8_t cmd, uint16_t size);
+static inline void Luos_EmptyNode(void);
+static inline void Luos_PackageInit(void);
+static inline void Luos_PackageLoop(void);
+static inline void Luos_SetState(node_state_t state);
 
 /******************************************************************************
  * @brief Luos init must be call in project init
@@ -166,6 +179,9 @@ static error_return_t Luos_IsALuosCmd(container_t *container, uint8_t cmd, uint1
             {
                 return SUCCEED;
             }
+            break;
+        case BOOTLOADER_CMD:
+            return SUCCEED;
             break;
         default:
             return FAILED;
@@ -343,6 +359,11 @@ static error_return_t Luos_MsgHandler(container_t *container, msg_t *input)
             container->auto_refresh.time_ms     = (uint16_t)TimeOD_TimeTo_ms(time);
             container->auto_refresh.last_update = LuosHAL_GetSystick();
             consume                             = SUCCEED;
+            break;
+        case BOOTLOADER_CMD:
+            // send data to the bootloader
+            LuosBootloader_MsgHandler(input);
+            consume = SUCCEED;
             break;
         default:
             break;
@@ -927,4 +948,100 @@ error_return_t Luos_TxComplete(void)
 void Luos_Flush(void)
 {
     Robus_Flush();
+}
+
+/******************************************************************************
+ * @brief register a new package
+ * @param package to register
+ * @return None
+ ******************************************************************************/
+void Luos_AddPackage(void (*Init)(void), void (*Loop)(void))
+{
+    package_table[package_number].Init = Init;
+    package_table[package_number].Loop = Loop;
+
+    package_number += 1;
+}
+
+/******************************************************************************
+ * @brief Create a service to signal empty node
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_EmptyNode(void)
+{
+    Luos_CreateContainer(0, VOID_MOD, "empty_node", luos_version);
+}
+
+/******************************************************************************
+ * @brief Run each package Init()
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_PackageInit(void)
+{
+    uint16_t package_index = 0;
+    if (package_number)
+    {
+        while (package_index < package_number)
+        {
+            package_table[package_index].Init();
+            package_index += 1;
+        }
+    }
+    else
+    {
+        Luos_EmptyNode();
+    }
+}
+
+/******************************************************************************
+ * @brief Run each package Loop()
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_PackageLoop(void)
+{
+    uint16_t package_index = 0;
+    while (package_index < package_number)
+    {
+        package_table[package_index].Loop();
+        package_index += 1;
+    }
+}
+
+/******************************************************************************
+ * @brief Luos high level state machine
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_SetState(node_state_t state)
+{
+    node_state = state;
+}
+
+/******************************************************************************
+ * @brief Luos high level state machine
+ * @param None
+ * @return None
+ ******************************************************************************/
+void Luos_Run(void)
+{
+    switch (node_state)
+    {
+        case NODE_INIT:
+            Luos_Init();
+            Luos_PackageInit();
+            // go to run state after initialization
+            Luos_SetState(NODE_RUN);
+            break;
+        case NODE_RUN:
+            Luos_Loop();
+            Luos_PackageLoop();
+            break;
+        default:
+            Luos_Loop();
+            Luos_PackageLoop();
+            break;
+    }
 }

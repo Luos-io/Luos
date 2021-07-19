@@ -15,7 +15,8 @@
             "-I Templates/State",
             "-I Templates/Motor",
             "-I Templates/Servo_motor",
-            "-I Templates/Voltage"
+            "-I Templates/Voltage",
+            "-I Bootloader"
         ],
         "srcFilter": [
             "+<*.c>",
@@ -23,7 +24,8 @@
             "+<../Templates/State/*.c>",
             "+<../Templates/Motor/*.c>",
             "+<../Templates/Servo_motor/*.c>",
-            "+<../Templates/Voltage/*.c>"
+            "+<../Templates/Voltage/*.c>",
+            "+<../Bootloader/*.c>"
         ]
     },
     "dependencies": [

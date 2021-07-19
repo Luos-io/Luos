@@ -81,6 +81,15 @@ typedef enum
     NO_ACCESS
 } access_t;
 
+/* This structure is used to manage packages
+ * please refer to the documentation
+ */
+typedef struct
+{
+    void (*Init)(void);
+    void (*Loop)(void);
+} package_t;
+
 /* This structure is used to manage containers
  * please refer to the documentation
  */
